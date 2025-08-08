@@ -1,21 +1,211 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en" dir="ltr">
 <head>
-    <meta charset="UTF-8">
-    <title>موقعي الجديد</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin-top: 100px;
-        }
-        h1 {
-            color: #0077cc;
-        }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Baganiza Store — متجر تجريبي</title>
+  <style>
+    :root{
+      --accent:#ff9900; /* أمازونية */
+      --dark:#111;
+      --muted:#666;
+      --card-bg:#fff;
+      --bg:#f5f5f5;
+    }
+    html,body{height:100%;margin:0;font-family:Inter, Arial, Helvetica, sans-serif;background:var(--bg);color:var(--dark)}
+    .container{max-width:1100px;margin:18px auto;padding:0 16px}
+    header{display:flex;align-items:center;gap:16px;padding:14px 0}
+    .logo{font-weight:700;font-size:20px;color:var(--accent)}
+    .search{flex:1}
+    .search input{width:100%;padding:10px;border-radius:6px;border:1px solid #ddd}
+    .actions{display:flex;gap:8px;align-items:center}
+    .btn{background:var(--accent);color:#fff;padding:8px 12px;border-radius:6px;border:none;cursor:pointer}
+    .lang-toggle{background:#fff;border:1px solid #ddd;padding:6px 8px;border-radius:6px;cursor:pointer}
+    nav{display:flex;gap:12px;margin:12px 0}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
+    .card{background:var(--card-bg);border-radius:8px;padding:12px;box-shadow:0 2px 6px rgba(0,0,0,.05)}
+    .card img{width:100%;height:160px;object-fit:cover;border-radius:6px}
+    .price{color:var(--accent);font-weight:700;margin-top:8px}
+    footer{margin:30px 0;text-align:center;color:var(--muted)}
+
+    /* Admin modal */
+    .admin-toggle{margin-left:8px;background:#fff;border:1px solid #ddd;padding:6px 8px;border-radius:6px}
+    .admin-panel{position:fixed;right:18px;top:80px;width:420px;max-width:90%;background:#fff;border-radius:10px;padding:12px;box-shadow:0 10px 30px rgba(0,0,0,.12);display:none;z-index:40}
+    .admin-panel.open{display:block}
+    .form-row{display:flex;gap:8px;margin-bottom:8px}
+    .form-row input,.form-row textarea{flex:1;padding:8px;border:1px solid #ddd;border-radius:6px}
+    .small{font-size:13px;color:var(--muted)}
+    .rtl{direction:rtl}
+
+    /* Responsive */
+    @media (max-width:600px){.card img{height:140px}}
+  </style>
 </head>
 <body>
-    <h1>أهلاً وسهلاً بكم 👋</h1>
-    <p>هذا هو موقعي الجديد على GitHub Pages!</p>
+  <div class="container" id="app">
+    <header>
+      <div class="logo">Baganiza Store</div>
+      <div class="search"><input id="search" placeholder="Search — ابحث عن منتجات"/></div>
+      <div class="actions">
+        <button class="lang-toggle" id="langBtn">عربي</button>
+        <button class="btn" id="openAdmin">Admin</button>
+      </div>
+    </header>
+
+    <nav id="breadcrumbs" class="small">عرض: <span id="viewLabel">الكل / All</span></nav>
+
+    <section id="productsArea" class="grid"></section>
+
+    <footer>© <span id="year"></span> Baganiza Store — صفحة تجريبية مبنية على GitHub Pages</footer>
+  </div>
+
+  <!-- Admin panel (single-file admin) -->
+  <div class="admin-panel" id="adminPanel">
+    <h3 id="adminTitle">Admin Panel</h3>
+    <div class="small">Add / Edit products (data saved to localStorage). Use Export / Import to sync with repository.</div>
+
+    <div style="margin-top:10px">
+      <div class="form-row">
+        <input id="p_title_en" placeholder="Title (EN)" />
+        <input id="p_title_ar" placeholder="Title (AR)" />
+      </div>
+      <div class="form-row">
+        <input id="p_price" placeholder="Price (e.g. 29.99)" />
+        <input id="p_img" placeholder="Image URL (or leave empty)" />
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:8px">
+        <button class="btn" id="addProduct">Add Product</button>
+        <button class="admin-toggle" id="clearStorage">Clear Local</button>
+      </div>
+
+      <div style="margin-top:8px">
+        <div class="small">Products data (editable):</div>
+        <textarea id="productsRaw" style="width:100%;height:140px;margin-top:6px;padding:8px;border:1px solid #ddd;border-radius:6px;font-family:monospace;font-size:13px"></textarea>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button class="btn" id="saveRaw">Save Data</button>
+          <button class="admin-toggle" id="exportJSON">Export JSON</button>
+          <button class="admin-toggle" id="importJSON">Import JSON</button>
+        </div>
+      </div>
+
+      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="admin-toggle" id="closeAdmin">Close</button>
+        <button class="admin-toggle" id="openInRepo">How to push to GitHub</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ---------- Data & i18n ---------- */
+    const defaultProducts = [
+      {id:1,title_en:'Wireless Headphones',title_ar:'سماعات لاسلكية',price:59.99,img:'https://picsum.photos/seed/1/600/400'},
+      {id:2,title_en:'Smart Watch',title_ar:'ساعة ذكية',price:89.5,img:'https://picsum.photos/seed/2/600/400'},
+      {id:3,title_en:'Coffee Maker',title_ar:'آلة قهوة',price:39.0,img:'https://picsum.photos/seed/3/600/400'},
+      {id:4,title_en:'Bluetooth Speaker',title_ar:'مكبر صوت بلوتوث',price:25.0,img:'https://picsum.photos/seed/4/600/400'}
+    ];
+
+    const LANG = {EN:'en',AR:'ar'}
+    let lang = localStorage.getItem('site_lang') || LANG.EN
+
+    /* ---------- Helpers ---------- */
+    const $ = sel => document.querySelector(sel)
+    const $$ = sel => Array.from(document.querySelectorAll(sel))
+
+    function loadProducts(){
+      try{
+        const raw = localStorage.getItem('products_v1')
+        if(!raw) return defaultProducts.slice()
+        return JSON.parse(raw)
+      }catch(e){return defaultProducts.slice()}
+    }
+    function saveProducts(arr){ localStorage.setItem('products_v1',JSON.stringify(arr, null,2)); }
+
+    /* ---------- Rendering ---------- */
+    function render(){
+      const products = loadProducts()
+      const area = $('#productsArea')
+      area.innerHTML=''
+      const search = $('#search').value.trim().toLowerCase()
+      const isAr = (lang===LANG.AR)
+      document.documentElement.dir = isAr ? 'rtl':'ltr'
+      document.getElementById('viewLabel').textContent = isAr ? 'الكل' : 'All'
+      $('#year').textContent = new Date().getFullYear()
+      $('#langBtn').textContent = isAr ? 'EN' : 'عربي'
+      $('#adminTitle').textContent = isAr ? 'لوحة الإدارة' : 'Admin Panel'
+
+      products.filter(p=>{
+        if(!search) return true
+        return (p.title_en+p.title_ar+(p.price||'')).toString().toLowerCase().includes(search)
+      }).forEach(p=>{
+        const card = document.createElement('div')
+        card.className='card'
+        card.innerHTML = `
+          <img src="${p.img||'https://picsum.photos/seed/'+p.id+'/600/400'}" alt="${isAr?p.title_ar:p.title_en}" />
+          <div style="margin-top:8px;font-weight:600">${isAr?escapeHtml(p.title_ar):escapeHtml(p.title_en)}</div>
+          <div class="price">$${Number(p.price).toFixed(2)}</div>
+          <div style="margin-top:8px;display:flex;gap:8px"><button class="btn" onclick="addToCart(${p.id})">${isAr?'أضف إلى السلة':'Add to cart'}</button></div>
+        `
+        area.appendChild(card)
+      })
+    }
+
+    function escapeHtml(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+    /* ---------- Cart (simple) ---------- */
+    function addToCart(id){alert((lang===LANG.AR)?'أضيف المنتج إلى السلة':'Added to cart')}
+
+    /* ---------- Admin actions ---------- */
+    function openAdmin(){ $('#adminPanel').classList.add('open') }
+    function closeAdmin(){ $('#adminPanel').classList.remove('open') }
+
+    function populateRaw(){ $('#productsRaw').value = JSON.stringify(loadProducts(), null, 2) }
+
+    document.addEventListener('click', e=>{
+      if(e.target.matches('#openAdmin')) openAdmin()
+      if(e.target.matches('#closeAdmin')) closeAdmin()
+      if(e.target.matches('#langBtn')){ lang=(lang===LANG.EN?LANG.AR:LANG.EN); localStorage.setItem('site_lang',lang); render(); }
+      if(e.target.matches('#addProduct')){
+        const en = $('#p_title_en').value.trim() || 'New Product'
+        const ar = $('#p_title_ar').value.trim() || en
+        const price = parseFloat($('#p_price').value) || 0
+        const img = $('#p_img').value.trim()
+        const arr = loadProducts()
+        const next = arr.length? Math.max(...arr.map(x=>x.id))+1 : 1
+        arr.push({id:next,title_en:en,title_ar:ar,price:price,img:img})
+        saveProducts(arr)
+        populateRaw(); render();
+        $('#p_title_en').value='';$('#p_title_ar').value='';$('#p_price').value='';$('#p_img').value=''
+      }
+      if(e.target.matches('#clearStorage')){ if(confirm('Clear local data?')){ localStorage.removeItem('products_v1'); render(); populateRaw(); }}
+      if(e.target.matches('#saveRaw')){
+        try{ const parsed = JSON.parse($('#productsRaw').value); saveProducts(parsed); render(); alert((lang===LANG.AR)?'تم الحفظ محليًا':'Saved locally') }catch(err){ alert('Invalid JSON') }
+      }
+      if(e.target.matches('#exportJSON')){
+        const data = JSON.stringify(loadProducts(), null,2)
+        const blob = new Blob([data],{type:'application/json'})
+        const url = URL.createObjectURL(blob)
+        const a=document.createElement('a'); a.href=url; a.download='products.json'; a.click(); URL.revokeObjectURL(url)
+      }
+      if(e.target.matches('#importJSON')){
+        const txt = prompt('Paste JSON here'); if(!txt) return; try{ const j=JSON.parse(txt); saveProducts(j); populateRaw(); render(); alert('Imported') }catch(e){alert('Invalid JSON')}
+      }
+      if(e.target.matches('#openInRepo')){
+        alert('To persist changes to GitHub, export products.json, then upload to your repository and commit. Or edit products.json directly in GitHub. See README in the repo.')
+      }
+    })
+
+    // search debounce
+    let to;
+    $('#search').addEventListener('input',()=>{ clearTimeout(to); to=setTimeout(render,300) })
+
+    // raw textarea sync
+    $('#productsRaw').addEventListener('focus', populateRaw)
+
+    // init
+    (function init(){
+      if(!localStorage.getItem('products_v1')) saveProducts(defaultProducts)
+      populateRaw(); render();
+    })()
+  </script>
 </body>
 </html>
