@@ -1,300 +1,268 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="en" dir="ltr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>My Store</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>My Store</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter&display=swap');
 
-    body {
-      font-family: 'Inter', sans-serif;
-      margin: 0;
-      background: #e6f0ff;
-      color: #333;
-      display: flex;
-      min-height: 100vh;
-      direction: ltr;
-    }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #e8f0fe;
+    margin: 0;
+    padding: 20px;
+    color: #333;
+  }
 
-    /* الحاوية العامة */
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+  header h1 {
+    margin: 0;
+    font-weight: 700;
+  }
+  header button {
+    background: #2978f0;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  header button:hover {
+    background: #155bb5;
+  }
+
+  .main-container {
+    display: flex;
+    gap: 20px;
+  }
+
+  #searchFilter {
+    margin-bottom: 15px;
+    display: flex;
+    gap: 10px;
+  }
+  #searchInput, #categorySelect {
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+    flex: 1;
+  }
+
+  #productsContainer {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    flex: 3;
+  }
+
+  .product {
+    background: #d7e3fc;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgb(41 56 115 / 0.1);
+    transition: background-color 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .product:hover {
+    background-color: #b3c1f9;
+  }
+  .product h3 {
+    margin: 0 0 10px 0;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #1a237e;
+  }
+  .product p {
+    margin: 4px 0;
+    flex-grow: 1;
+    font-size: 0.95rem;
+  }
+  .product button {
+    background-color: #2978f0;
+    border: none;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    margin-top: 10px;
+  }
+  .product button:hover {
+    background-color: #155bb5;
+  }
+
+  /* سلة المشتريات */
+  aside#cart {
+    width: 280px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgb(0 0 0 / 0.1);
+    padding: 20px;
+    position: relative;
+    flex-shrink: 0;
+    height: fit-content;
+  }
+  aside#cart h2 {
+    margin-top: 0;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  #cartItems {
+    max-height: 300px;
+    overflow-y: auto;
+    margin-bottom: 15px;
+  }
+  .cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+    gap: 8px;
+  }
+  .cart-item-name {
+    flex: 1;
+  }
+  .cart-item-qty {
+    min-width: 30px;
+    text-align: center;
+  }
+  .cart-item-price {
+    min-width: 60px;
+    text-align: right;
+    font-weight: 600;
+    color: #222;
+  }
+  .remove-btn {
+    background: #e53935;
+    border: none;
+    color: white;
+    font-weight: 700;
+    border-radius: 6px;
+    cursor: pointer;
+    padding: 2px 8px;
+    font-size: 1rem;
+    line-height: 1;
+  }
+  .remove-btn:hover {
+    background: #b71c1c;
+  }
+
+  #totalPrice {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #d32f2f;
+    background: #f9d6d5;
+    padding: 8px 10px;
+    border-radius: 6px;
+    text-align: center;
+    margin-bottom: 15px;
+  }
+
+  /* أيقونة السلة */
+  #cartIconContainer {
+    position: fixed;
+    right: 20px;
+    bottom: 80px; /* أقل من كلمة Shopping Cart */
+    background: #2978f0;
+    color: white;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgb(41 56 115 / 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 24px;
+    z-index: 1000;
+  }
+  #cartCount {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    background: #ffeb3b;
+    color: #000;
+    width: 18px;
+    height: 18px;
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 50%;
+    display: none;
+    justify-content: center;
+    align-items: center;
+  }
+
+  /* خيارات الدفع */
+  #paymentSection {
+    margin-top: 15px;
+  }
+  #paymentSection h3 {
+    margin: 10px 0 8px 0;
+    font-weight: 700;
+    font-size: 1rem;
+  }
+  .payment-option {
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+  }
+  .payment-option input {
+    margin-right: 8px;
+    cursor: pointer;
+  }
+  .payment-option label {
+    cursor: pointer;
+  }
+
+  /* تصغير النافذة: */
+  @media (max-width: 900px) {
     .main-container {
-      flex: 1;
-      margin-right: 320px; /* مساحة السلة */
-      padding: 90px 20px 20px 20px;
-      box-sizing: border-box;
-    }
-
-    header {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      height: 60px;
-      background: #0047b3;
-      color: white;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0 20px;
-      z-index: 20;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    }
-
-    header h1 {
-      margin: 0;
-      font-weight: 700;
-      font-size: 1.6rem;
-    }
-
-    #langToggle {
-      background: white;
-      color: #0047b3;
-      border: none;
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-    #langToggle:hover {
-      background-color: #cce0ff;
-    }
-
-    /* البحث والتصنيف */
-    #searchFilter {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-    }
-    #searchInput {
-      flex: 1;
-      padding: 8px 12px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      font-size: 1rem;
-      outline-color: #0047b3;
-    }
-    #categorySelect {
-      width: 160px;
-      padding: 8px 12px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      font-size: 1rem;
-      outline-color: #0047b3;
-      background: white;
-      cursor: pointer;
-    }
-
-    /* شبكة المنتجات */
-    #productsContainer {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 15px;
-    }
-
-    .product {
-      background: #dbe9ff;
-      border-radius: 8px;
-      padding: 15px;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-      transition: background-color 0.3s ease, transform 0.2s ease;
-      cursor: pointer;
-      display: flex;
       flex-direction: column;
-      justify-content: space-between;
     }
-    .product:hover {
-      background-color: #a3c4ff;
-      transform: translateY(-5px);
+    #productsContainer {
+      grid-template-columns: repeat(2, 1fr);
+      margin-bottom: 20px;
     }
-    .product h3 {
-      margin-top: 0;
-      margin-bottom: 8px;
-      font-weight: 600;
-      font-size: 1.1rem;
-    }
-    .product p {
-      margin: 4px 0;
-      font-size: 0.9rem;
-      flex-grow: 1;
-    }
-    .add-btn {
-      margin-top: 10px;
-      background: #0047b3;
-      color: white;
-      border: none;
-      padding: 8px 12px;
-      border-radius: 5px;
-      font-weight: 600;
-      cursor: pointer;
+    aside#cart {
       width: 100%;
-      transition: background-color 0.3s ease;
-      align-self: center;
-    }
-    .add-btn:hover {
-      background: #002e7a;
-    }
-
-    /* أيقونة السلة وعدد المنتجات */
-    #cartIconContainer {
-      position: fixed;
-      top: 15px;
-      right: 15px;
-      cursor: pointer;
-      z-index: 30;
-    }
-    #cartIcon {
-      font-size: 28px;
-      color: #0047b3;
       position: relative;
-    }
-    #cartCount {
-      position: absolute;
-      top: -8px;
-      right: -10px;
-      background: #ffcc00;
-      color: #222;
-      font-weight: 700;
-      font-size: 14px;
-      border-radius: 50%;
-      padding: 3px 7px;
-      min-width: 22px;
-      text-align: center;
-      box-shadow: 0 0 4px rgba(0,0,0,0.2);
-      display: none;
-    }
-
-    /* سلة المشتريات */
-    #cart {
-      width: 300px;
-      position: fixed;
-      top: 70px;
-      right: 10px;
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.15);
-      padding: 20px;
-      max-height: calc(100vh - 90px);
-      overflow-y: auto;
-      z-index: 15;
-      display: block;
-    }
-    #cart h2 {
-      margin-top: 0;
-      font-weight: 700;
-      text-align: center;
-      font-size: 1.4rem;
-      border-bottom: 2px solid #0047b3;
-      padding-bottom: 8px;
-      margin-bottom: 15px;
-    }
-    .cart-item {
-      border-bottom: 1px solid #ddd;
-      padding: 10px 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .cart-item:last-child {
-      border-bottom: none;
-    }
-    .cart-item-name {
-      font-weight: 600;
-      max-width: 140px;
-      word-break: break-word;
-    }
-    .cart-item-qty {
-      margin: 0 10px;
-      font-size: 1rem;
-    }
-    .cart-item-price {
-      font-weight: 600;
-    }
-    .remove-btn {
-      background: transparent;
-      border: none;
-      color: #d11a2a;
-      font-weight: 700;
-      cursor: pointer;
-      font-size: 18px;
-    }
-    #totalPrice {
       margin-top: 15px;
-      text-align: center;
-      font-size: 1.3rem;
-      font-weight: 700;
-      color: #d11a2a;
-      background: #ffe6e6;
-      padding: 8px;
-      border-radius: 6px;
-      box-shadow: inset 0 0 6px rgba(209,26,42,0.3);
     }
-
-    /* منطقة الدفع */
-    #paymentSection {
-      margin-top: 20px;
-      border-top: 2px solid #0047b3;
-      padding-top: 15px;
-      font-size: 0.95rem;
+    #cartIconContainer {
+      right: 20px;
+      bottom: 140px;
     }
-    #paymentSection h3 {
-      margin: 0 0 10px 0;
-      font-weight: 700;
-      color: #0047b3;
-      text-align: center;
+  }
+  @media (max-width: 600px) {
+    #productsContainer {
+      grid-template-columns: 1fr;
     }
-    .payment-option {
-      margin-bottom: 10px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
+    #cartIconContainer {
+      right: 20px;
+      bottom: 180px;
     }
-    .payment-option input[type="radio"] {
-      margin-right: 8px;
-      cursor: pointer;
-    }
-    .payment-option label {
-      cursor: pointer;
-      user-select: none;
-    }
-
-    /* استجابة */
-    @media (max-width: 900px) {
-      .main-container {
-        margin-right: 0;
-        padding: 80px 15px 15px 15px;
-      }
-      #productsContainer {
-        grid-template-columns: repeat(2, 1fr);
-      }
-      #cart {
-        position: relative;
-        width: 100%;
-        max-height: none;
-        margin: 10px auto 20px;
-        box-shadow: none;
-        border-radius: 0;
-        padding: 10px;
-      }
-      #cartIconContainer {
-        display: none;
-      }
-    }
-    @media (max-width: 550px) {
-      #productsContainer {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
+  }
+</style>
 </head>
 <body>
 
-  <header>
-    <h1 id="title">My Store</h1>
-    <button id="langToggle">عربي</button>
-  </header>
+<header>
+  <h1 id="title">My Store</h1>
+  <button id="langToggle">عربي</button>
+</header>
 
-  <div class="main-container">
+<div class="main-container">
+  <div style="flex:1;">
     <div id="searchFilter">
       <input type="text" id="searchInput" placeholder="Search products..." />
       <select id="categorySelect">
@@ -305,11 +273,6 @@
     <div id="productsContainer">
       <!-- المنتجات تظهر هنا -->
     </div>
-  </div>
-
-  <div id="cartIconContainer" title="Shopping Cart">
-    <span id="cartIcon">🛒</span>
-    <span id="cartCount"></span>
   </div>
 
   <aside id="cart" aria-label="Shopping Cart">
@@ -340,210 +303,239 @@
         <label for="payCard">Credit Card</label>
       </div>
     </section>
+
+    <button id="checkoutBtn" style="margin-top:15px; width:100%; padding:10px; background:#2978f0; border:none; color:#fff; border-radius:6px; cursor:pointer; font-weight:700;">
+      Checkout
+    </button>
   </aside>
+</div>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<div id="cartIconContainer" aria-label="Shopping Cart">
+  🛒
+  <div id="cartCount"></div>
+</div>
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyCcWgFDzs95TbVU7v5h_5O0lNzZvBlL90o",
-      authDomain: "baganiza-66bf0.firebaseapp.com",
-      projectId: "baganiza-66bf0",
-      storageBucket: "baganiza-66bf0.firebasestorage.app",
-      messagingSenderId: "1016966032123",
-      appId: "1:1016966032123:web:fbffd397c7d8494fa79e5e"
-    };
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyCcWgFDzs95TbVU7v5h_5O0lNzZvBlL90o",
+    authDomain: "baganiza-66bf0.firebaseapp.com",
+    projectId: "baganiza-66bf0",
+    storageBucket: "baganiza-66bf0.firebasestorage.app",
+    messagingSenderId: "1016966032123",
+    appId: "1:1016966032123:web:fbffd397c7d8494fa79e5e"
+  };
 
-    let currentLang = 'en';
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
 
-    const productsContainer = document.getElementById('productsContainer');
-    const langToggle = document.getElementById('langToggle');
-    const title = document.getElementById('title');
+  let currentLang = 'en'; // اللغة الافتراضية
+  const productsContainer = document.getElementById('productsContainer');
+  const langToggle = document.getElementById('langToggle');
+  const title = document.getElementById('title');
+  const searchInput = document.getElementById('searchInput');
+  const categorySelect = document.getElementById('categorySelect');
 
-    const searchInput = document.getElementById('searchInput');
-    const categorySelect = document.getElementById('categorySelect');
+  const cart = document.getElementById('cart');
+  const cartItemsContainer = document.getElementById('cartItems');
+  const totalPriceEl = document.getElementById('totalPrice');
+  const checkoutBtn = document.getElementById('checkoutBtn');
+  const cartIconContainer = document.getElementById('cartIconContainer');
+  const cartCount = document.getElementById('cartCount');
 
-    const cart = document.getElementById('cart');
-    const cartItemsContainer = document.getElementById('cartItems');
-    const totalPriceEl = document.getElementById('totalPrice');
-    const cartIconContainer = document.getElementById('cartIconContainer');
-    const cartCount = document.getElementById('cartCount');
+  let products = [];
+  let cartItems = {};
 
-    let cartItems = {};
-    let allProducts = [];
-    let categories = new Set();
+  langToggle.addEventListener('click', () => {
+    currentLang = currentLang === 'en' ? 'ar' : 'en';
+    if(currentLang === 'ar'){
+      title.textContent = 'متجري';
+      langToggle.textContent = 'English';
+      document.body.dir = 'rtl';
+      searchInput.placeholder = 'ابحث عن المنتجات...';
+      categorySelect.options[0].text = 'كل التصنيفات';
+      cart.querySelector('h2').textContent = 'عربة التسوق';
+      totalPriceEl.textContent = `المجموع: $${calculateTotal()}`;
+      checkoutBtn.textContent = 'الدفع';
+      // Payment labels
+      document.querySelector("label[for='payCash']").textContent = 'الدفع عند الاستلام';
+      document.querySelector("label[for='payBank']").textContent = 'التحويل البنكي';
+      document.querySelector("label[for='payStc']").textContent = 'STC Pay';
+      document.querySelector("label[for='payPaypal']").textContent = 'باي بال';
+      document.querySelector("label[for='payCard']").textContent = 'بطاقة ائتمان';
+      cart.style.direction = 'rtl';
+    } else {
+      title.textContent = 'My Store';
+      langToggle.textContent = 'عربي';
+      document.body.dir = 'ltr';
+      searchInput.placeholder = 'Search products...';
+      categorySelect.options[0].text = 'All Categories';
+      cart.querySelector('h2').textContent = 'Shopping Cart';
+      totalPriceEl.textContent = `Total: $${calculateTotal()}`;
+      checkoutBtn.textContent = 'Checkout';
+      // Payment labels
+      document.querySelector("label[for='payCash']").textContent = 'Cash on Delivery';
+      document.querySelector("label[for='payBank']").textContent = 'Bank Transfer';
+      document.querySelector("label[for='payStc']").textContent = 'STC Pay';
+      document.querySelector("label[for='payPaypal']").textContent = 'PayPal';
+      document.querySelector("label[for='payCard']").textContent = 'Credit Card';
+      cart.style.direction = 'ltr';
+    }
+    renderProducts();
+    renderCart();
+  });
 
-    // تحميل المنتجات من Firebase
-    function loadProducts() {
-      productsContainer.innerHTML = 'Loading products...';
-      db.collection('products').get().then(snapshot => {
-        if (snapshot.empty) {
-          productsContainer.textContent = currentLang === 'ar' ? 'لا توجد منتجات.' : 'No products found.';
-          return;
-        }
-        allProducts = [];
-        categories.clear();
-        snapshot.forEach(doc => {
-          const product = doc.data();
-          product.id = doc.id;
-          allProducts.push(product);
-          if(product.category) categories.add(product.category);
-        });
-        fillCategories();
-        renderProducts();
+  function loadProducts(){
+    productsContainer.innerHTML = 'Loading products...';
+    db.collection('products').get().then(snapshot => {
+      products = [];
+      categorySelect.innerHTML = '<option value="">' + (currentLang === 'ar' ? 'كل التصنيفات' : 'All Categories') + '</option>';
+
+      snapshot.forEach(doc => {
+        let product = doc.data();
+        product.id = doc.id;
+        products.push(product);
       });
-    }
 
-    // تعبئة قائمة التصنيفات ديناميكياً
-    function fillCategories(){
-      categorySelect.innerHTML = `<option value="">${currentLang === 'ar' ? 'كل التصنيفات' : 'All Categories'}</option>`;
-      [...categories].sort().forEach(cat => {
-        categorySelect.innerHTML += `<option value="${cat}">${cat}</option>`;
-      });
-    }
-
-    // عرض المنتجات مع ترتيب وتجميع
-    function renderProducts(){
-      productsContainer.innerHTML = '';
-
-      // تصفية حسب البحث والتصنيف
-      const searchText = searchInput.value.trim().toLowerCase();
-      const selectedCategory = categorySelect.value;
-
-      // تجميع المنتجات بنفس الاسم
-      let grouped = {};
-      allProducts.forEach(p => {
-        // تحقق من تصفية البحث والتصنيف
-        if(searchText && !p.name.toLowerCase().includes(searchText)) return;
-        if(selectedCategory && p.category !== selectedCategory) return;
-
-        const key = p.name.trim().toLowerCase();
-        if(!grouped[key]) grouped[key] = [];
-        grouped[key].push(p);
+      // بناء قائمة التصنيفات بدون تكرار
+      const categories = [...new Set(products.map(p => p.category || (currentLang === 'ar' ? 'عام' : 'General')))];
+      categories.forEach(cat => {
+        const option = document.createElement('option');
+        option.value = cat;
+        option.textContent = cat;
+        categorySelect.appendChild(option);
       });
 
-      if(Object.keys(grouped).length === 0){
-        productsContainer.textContent = currentLang === 'ar' ? 'لا توجد منتجات مطابقة.' : 'No matching products.';
-        return;
-      }
-
-      for (const key in grouped) {
-        grouped[key].forEach(product => {
-          const productDiv = document.createElement('div');
-          productDiv.className = 'product';
-          productDiv.innerHTML = `
-            <h3>${product.name}</h3>
-            <p><strong>${currentLang === 'ar' ? 'السعر' : 'Price'}:</strong> $${product.price}</p>
-            <p>${product.description}</p>
-            <button class="add-btn">${currentLang === 'ar' ? 'أضف للسلة' : 'Add to Cart'}</button>
-          `;
-          productDiv.querySelector('button').addEventListener('click', () => addToCart(product));
-          productsContainer.appendChild(productDiv);
-        });
-      }
-    }
-
-    // أضف منتج للسلة
-    function addToCart(product){
-      if(cartItems[product.id]){
-        cartItems[product.id].qty++;
-      } else {
-        cartItems[product.id] = {...product, qty: 1};
-      }
-      renderCart();
-    }
-
-    // إزالة منتج من السلة
-    function removeFromCart(id){
-      delete cartItems[id];
-      renderCart();
-    }
-
-    // حساب المجموع الكلي
-    function calculateTotal(){
-      let total = 0;
-      for(const id in cartItems){
-        total += cartItems[id].price * cartItems[id].qty;
-      }
-      return total.toFixed(2);
-    }
-
-    // عرض محتوى السلة
-    function renderCart(){
-      cartItemsContainer.innerHTML = '';
-      const items = Object.values(cartItems);
-      if(items.length === 0){
-        cartItemsContainer.innerHTML = `<p>${currentLang === 'ar' ? 'سلة المشتريات فارغة.' : 'Your cart is empty.'}</p>`;
-        cartCount.style.display = 'none';
-      } else {
-        items.forEach(item => {
-          const div = document.createElement('div');
-          div.className = 'cart-item';
-          div.innerHTML = `
-            <span class="cart-item-name">${item.name}</span>
-            <span class="cart-item-qty">x${item.qty}</span>
-            <span class="cart-item-price">$${(item.price * item.qty).toFixed(2)}</span>
-            <button class="remove-btn" title="${currentLang === 'ar' ? 'إزالة' : 'Remove'}">&times;</button>
-          `;
-          div.querySelector('button').addEventListener('click', () => removeFromCart(item.id));
-          cartItemsContainer.appendChild(div);
-        });
-        cartCount.style.display = 'inline-block';
-        cartCount.textContent = items.length;
-      }
-      totalPriceEl.textContent = currentLang === 'ar' ? `الإجمالي: $${calculateTotal()}` : `Total: $${calculateTotal()}`;
-    }
-
-    // تبديل اللغة مع تحديث النصوص والاتجاه
-    langToggle.addEventListener('click', () => {
-      currentLang = currentLang === 'en' ? 'ar' : 'en';
-
-      if(currentLang === 'ar'){
-        title.textContent = 'متجري';
-        langToggle.textContent = 'English';
-        cart.querySelector('h2').textContent = 'عربة التسوق';
-        totalPriceEl.textContent = `الإجمالي: $${calculateTotal()}`;
-        searchInput.placeholder = 'ابحث عن المنتجات...';
-        fillCategories();
-        cart.style.direction = 'rtl';
-        document.body.dir = 'rtl';
-        cartItemsContainer.querySelectorAll('.cart-item-name').forEach(el => el.style.textAlign = 'right');
-      } else {
-        title.textContent = 'My Store';
-        langToggle.textContent = 'عربي';
-        cart.querySelector('h2').textContent = 'Shopping Cart';
-        totalPriceEl.textContent = `Total: $${calculateTotal()}`;
-        searchInput.placeholder = 'Search products...';
-        fillCategories();
-        cart.style.direction = 'ltr';
-        document.body.dir = 'ltr';
-        cartItemsContainer.querySelectorAll('.cart-item-name').forEach(el => el.style.textAlign = 'left');
-      }
       renderProducts();
-      renderCart();
+    });
+  }
+
+  function renderProducts(){
+    const filterText = searchInput.value.toLowerCase();
+    const selectedCategory = categorySelect.value;
+    productsContainer.innerHTML = '';
+
+    // فلترة المنتجات مع تجميع المنتجات ذات نفس الاسم
+    const filteredProducts = products.filter(p => {
+      const nameMatch = (p.name || '').toLowerCase().includes(filterText);
+      const categoryMatch = selectedCategory === '' || p.category === selectedCategory;
+      return nameMatch && categoryMatch;
     });
 
-    // التصفية حسب البحث والتصنيف
-    searchInput.addEventListener('input', renderProducts);
-    categorySelect.addEventListener('change', renderProducts);
-
-    // النقر على أيقونة السلة يخفي/يظهر السلة (اختياري)
-    cartIconContainer.addEventListener('click', () => {
-      if(cart.style.display === 'none' || cart.style.display === ''){
-        cart.style.display = 'block';
-      } else {
-        cart.style.display = 'none';
-      }
+    // تجميع المنتجات حسب الاسم
+    let grouped = {};
+    filteredProducts.forEach(p => {
+      if(!grouped[p.name]) grouped[p.name] = [];
+      grouped[p.name].push(p);
     });
 
-    // تحميل أولي للمنتجات
-    loadProducts();
+    // نرتب عرض المنتجات بحيث تظهر منتجات نفس الاسم بجانب بعض
+    for (const groupName in grouped) {
+      const groupItems = grouped[groupName];
+      groupItems.forEach(product => {
+        const productDiv = document.createElement('div');
+        productDiv.className = 'product';
+        productDiv.innerHTML = `
+          <h3>${product.name}</h3>
+          <p><strong>${currentLang === 'ar' ? 'السعر' : 'Price'}:</strong> $${product.price}</p>
+          <p>${product.description || ''}</p>
+          <button data-id="${product.id}">${currentLang === 'ar' ? 'أضف للسلة' : 'Add to Cart'}</button>
+        `;
+        productDiv.querySelector('button').addEventListener('click', () => {
+          addToCart(product.id);
+        });
+        productsContainer.appendChild(productDiv);
+      });
+    }
+  }
 
-  </script>
+  function addToCart(productId){
+    if(cartItems[productId]){
+      cartItems[productId].qty++;
+    } else {
+      const product = products.find(p => p.id === productId);
+      cartItems[productId] = {
+        ...product,
+        qty: 1
+      };
+    }
+    renderCart();
+  }
+
+  function removeFromCart(productId){
+    delete cartItems[productId];
+    renderCart();
+  }
+
+  function calculateTotal(){
+    return Object.values(cartItems).reduce((sum, item) => sum + item.price * item.qty, 0).toFixed(2);
+  }
+
+  function renderCart(){
+    cartItemsContainer.innerHTML = '';
+    const keys = Object.keys(cartItems);
+    if(keys.length === 0){
+      cartItemsContainer.innerHTML = currentLang === 'ar' ? 'السلة فارغة' : 'Cart is empty';
+      cartCount.style.display = 'none';
+      totalPriceEl.textContent = currentLang === 'ar' ? 'المجموع: $0.00' : 'Total: $0.00';
+      return;
+    }
+    keys.forEach(key => {
+      const item = cartItems[key];
+      const itemDiv = document.createElement('div');
+      itemDiv.className = 'cart-item';
+      itemDiv.innerHTML = `
+        <div class="cart-item-name">${item.name}</div>
+        <div class="cart-item-qty">x${item.qty}</div>
+        <div class="cart-item-price">$${(item.price * item.qty).toFixed(2)}</div>
+        <button class="remove-btn" aria-label="Remove item">&times;</button>
+      `;
+      itemDiv.querySelector('button').addEventListener('click', () => {
+        removeFromCart(key);
+      });
+      cartItemsContainer.appendChild(itemDiv);
+    });
+
+    totalPriceEl.textContent = (currentLang === 'ar' ? 'المجموع: ' : 'Total: ') + `$${calculateTotal()}`;
+    cartCount.style.display = keys.length > 0 ? 'flex' : 'none';
+    cartCount.textContent = keys.length;
+  }
+
+  checkoutBtn.addEventListener('click', () => {
+    if(Object.keys(cartItems).length === 0){
+      alert(currentLang === 'ar' ? 'السلة فارغة' : 'Your cart is empty.');
+      return;
+    }
+    // هنا يمكنك إضافة منطق الدفع أو توجيه المستخدم لصفحة الدفع حسب الطريقة المختارة
+    const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
+    alert((currentLang === 'ar' ? 'تم اختيار طريقة الدفع: ' : 'Payment method chosen: ') + paymentMethod);
+    // إعادة تعيين السلة بعد الدفع
+    cartItems = {};
+    renderCart();
+  });
+
+  searchInput.addEventListener('input', renderProducts);
+  categorySelect.addEventListener('change', renderProducts);
+
+  // عند الضغط على ايقونة السلة يظهر / يخفي نافذة السلة
+  cartIconContainer.addEventListener('click', () => {
+    if(cart.style.display === 'none' || !cart.style.display){
+      cart.style.display = 'block';
+    } else {
+      cart.style.display = 'none';
+    }
+  });
+
+  // في البداية اجعل السلة ظاهرة
+  cart.style.display = 'block';
+
+  // تحميل المنتجات من Firestore
+  loadProducts();
+
+</script>
+
 </body>
 </html>
