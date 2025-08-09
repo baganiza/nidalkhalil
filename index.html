@@ -5,93 +5,171 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>My Store</title>
 <style>
-  /* خط عام */
-  @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
-
   body {
-    font-family: 'Roboto', Arial, sans-serif;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     padding: 20px;
-    max-width: 1200px;
+    max-width: 900px;
     margin: auto;
-    background-color: #f7f7f7;
-    color: #111;
+    background-color: #f5f5f5;
+    color: #333;
   }
-
   header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 30px;
   }
-
   header h1 {
-    font-size: 2.5rem;
     font-weight: 700;
-    color: #232f3e; /* لون أمازون */
-    margin: 0;
+    font-size: 2.4rem;
+    color: #232f3e;
   }
-
-  button#langToggle {
-    background-color: #febd69;
+  #langToggle {
+    background-color: #232f3e;
+    color: white;
     border: none;
-    padding: 10px 18px;
+    padding: 10px 16px;
     border-radius: 4px;
-    font-weight: 700;
-    color: #111;
     cursor: pointer;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
-    transition: background-color 0.3s ease;
+    font-weight: 600;
+    transition: background-color 0.3s;
   }
-
-  button#langToggle:hover {
-    background-color: #f3a847;
+  #langToggle:hover {
+    background-color: #37475a;
   }
-
   #productsContainer {
     display: grid;
     grid-template-columns: repeat(auto-fill,minmax(260px,1fr));
     gap: 20px;
   }
-
   .product {
-    background-color: #fff;
-    border-radius: 6px;
+    background-color: white;
+    border-radius: 8px;
     box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
     padding: 20px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    transition: box-shadow 0.3s ease;
+    transition: box-shadow 0.3s;
   }
-
   .product:hover {
-    box-shadow: 0 6px 16px rgb(0 0 0 / 0.15);
+    box-shadow: 0 4px 12px rgb(0 0 0 / 0.15);
   }
-
   .product h3 {
-    font-size: 1.25rem;
-    margin-bottom: 12px;
-    color: #007185; /* لون أزرق أمازون */
+    margin: 0 0 12px 0;
+    color: #111;
+    font-size: 1.3rem;
   }
-
   .product p {
-    margin: 8px 0;
+    margin: 0 0 10px 0;
     flex-grow: 1;
-    color: #555;
     font-size: 0.95rem;
     line-height: 1.3;
   }
-
-  .product strong {
-    color: #b12704; /* لون أحمر أمازون للسعر */
+  .price {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #b12704;
+    margin-bottom: 12px;
+  }
+  .addToCartBtn {
+    background-color: #ffa41c;
+    border: none;
+    padding: 10px;
+    border-radius: 4px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  .addToCartBtn:hover {
+    background-color: #cc8500;
+  }
+  /* Cart styles */
+  #cart {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    width: 300px;
+    max-height: 70vh;
+    overflow-y: auto;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 14px rgb(0 0 0 / 0.2);
+    padding: 20px;
+    font-size: 0.95rem;
+    color: #111;
+    z-index: 100;
+  }
+  #cartTitle {
+    font-weight: 700;
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+    border-bottom: 2px solid #ffa41c;
+    padding-bottom: 6px;
+  }
+  #cartItems {
+    margin-bottom: 15px;
+  }
+  .cart-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    align-items: center;
+  }
+  .cart-item-name {
+    flex: 1;
+  }
+  .cart-item-qty {
+    margin: 0 10px;
+    width: 40px;
+  }
+  .cart-item-price {
+    font-weight: 600;
+    color: #b12704;
+  }
+  .remove-item-btn {
+    background: transparent;
+    border: none;
+    color: #e53935;
+    font-weight: 700;
+    cursor: pointer;
     font-size: 1.1rem;
   }
+  #totalPrice {
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    text-align: right;
+  }
+  #clearCartBtn {
+    background-color: #e53935;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    width: 100%;
+    transition: background-color 0.3s;
+  }
+  #clearCartBtn:hover {
+    background-color: #ab000d;
+  }
 
-  /* تحسين اتجاه النص عند اللغة العربية */
+  /* RTL support */
   body[dir="rtl"] {
     direction: rtl;
   }
-
+  body[dir="rtl"] header {
+    flex-direction: row-reverse;
+  }
+  body[dir="rtl"] #cart {
+    right: auto;
+    left: 20px;
+  }
+  body[dir="rtl"] .cart-item {
+    flex-direction: row-reverse;
+  }
 </style>
 </head>
 <body>
@@ -105,13 +183,20 @@
   <!-- المنتجات تظهر هنا -->
 </div>
 
+<div id="cart">
+  <div id="cartTitle">Shopping Cart</div>
+  <div id="cartItems"></div>
+  <div id="totalPrice">Total: $0</div>
+  <button id="clearCartBtn">Clear Cart</button>
+</div>
+
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
 <script>
   const firebaseConfig = {
-    apiKey: "AIzaSyCcWgFDzs95TbVU7v5h_5O0lNzZvBlL90o",
+    apiKey: "AIzaSyCcWgFDzs95TbVU7v5O0lNzZvBlL90o",
     authDomain: "baganiza-66bf0.firebaseapp.com",
     projectId: "baganiza-66bf0",
     storageBucket: "baganiza-66bf0.firebasestorage.app",
@@ -122,11 +207,17 @@
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
 
-  let currentLang = 'en'; // اللغة الافتراضية
+  let currentLang = 'en'; // default language
 
   const productsContainer = document.getElementById('productsContainer');
   const langToggle = document.getElementById('langToggle');
   const title = document.getElementById('title');
+  const cartTitle = document.getElementById('cartTitle');
+  const cartItemsDiv = document.getElementById('cartItems');
+  const totalPriceDiv = document.getElementById('totalPrice');
+  const clearCartBtn = document.getElementById('clearCartBtn');
+
+  let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
   langToggle.addEventListener('click', () => {
     currentLang = currentLang === 'en' ? 'ar' : 'en';
@@ -134,16 +225,21 @@
       title.textContent = 'متجري';
       langToggle.textContent = 'English';
       document.body.dir = 'rtl';
+      cartTitle.textContent = 'سلة المشتريات';
+      clearCartBtn.textContent = 'تفريغ السلة';
     } else {
       title.textContent = 'My Store';
       langToggle.textContent = 'عربي';
       document.body.dir = 'ltr';
+      cartTitle.textContent = 'Shopping Cart';
+      clearCartBtn.textContent = 'Clear Cart';
     }
     loadProducts();
+    renderCart();
   });
 
   function loadProducts(){
-    productsContainer.innerHTML = 'Loading products...';
+    productsContainer.innerHTML = currentLang === 'ar' ? 'جاري تحميل المنتجات...' : 'Loading products...';
     db.collection('products').get().then(snapshot => {
       productsContainer.innerHTML = '';
       if(snapshot.empty){
@@ -152,20 +248,103 @@
       }
       snapshot.forEach(doc => {
         const product = doc.data();
+        product.id = doc.id;
         const productDiv = document.createElement('div');
         productDiv.className = 'product';
         productDiv.innerHTML = `
           <h3>${product.name}</h3>
-          <p><strong>${currentLang === 'ar' ? 'السعر' : 'Price'}:</strong> $${product.price}</p>
+          <p class="price">${currentLang === 'ar' ? 'السعر' : 'Price'}: $${product.price}</p>
           <p>${product.description}</p>
+          <button class="addToCartBtn">${currentLang === 'ar' ? 'أضف للسلة' : 'Add to Cart'}</button>
         `;
+        productDiv.querySelector('button.addToCartBtn').addEventListener('click', () => {
+          addToCart(product);
+        });
         productsContainer.appendChild(productDiv);
       });
     });
   }
 
-  // تحميل المنتجات أول مرة
+  function addToCart(product){
+    const existing = cart.find(item => item.id === product.id);
+    if(existing){
+      existing.qty++;
+    } else {
+      cart.push({...product, qty: 1});
+    }
+    saveCart();
+    renderCart();
+  }
+
+  function removeFromCart(id){
+    cart = cart.filter(item => item.id !== id);
+    saveCart();
+    renderCart();
+  }
+
+  function changeQty(id, newQty){
+    const item = cart.find(i => i.id === id);
+    if(item){
+      item.qty = newQty;
+      if(item.qty <= 0){
+        removeFromCart(id);
+      } else {
+        saveCart();
+        renderCart();
+      }
+    }
+  }
+
+  function saveCart(){
+    localStorage.setItem('cart', JSON.stringify(cart));
+  }
+
+  function renderCart(){
+    cartItemsDiv.innerHTML = '';
+    if(cart.length === 0){
+      cartItemsDiv.textContent = currentLang === 'ar' ? 'السلة فارغة.' : 'Cart is empty.';
+      totalPriceDiv.textContent = currentLang === 'ar' ? 'المجموع: $0' : 'Total: $0';
+      return;
+    }
+    let total = 0;
+    cart.forEach(item => {
+      total += item.price * item.qty;
+      const itemDiv = document.createElement('div');
+      itemDiv.className = 'cart-item';
+      itemDiv.innerHTML = `
+        <div class="cart-item-name">${item.name}</div>
+        <input type="number" min="1" class="cart-item-qty" value="${item.qty}" />
+        <div class="cart-item-price">$${(item.price * item.qty).toFixed(2)}</div>
+        <button class="remove-item-btn" title="${currentLang === 'ar' ? 'إزالة' : 'Remove'}">&times;</button>
+      `;
+      // تغيير الكمية
+      itemDiv.querySelector('input.cart-item-qty').addEventListener('change', e => {
+        const val = parseInt(e.target.value);
+        if(isNaN(val) || val < 1){
+          e.target.value = item.qty;
+          return;
+        }
+        changeQty(item.id, val);
+      });
+      // زر إزالة
+      itemDiv.querySelector('button.remove-item-btn').addEventListener('click', () => {
+        removeFromCart(item.id);
+      });
+      cartItemsDiv.appendChild(itemDiv);
+    });
+    totalPriceDiv.textContent = currentLang === 'ar' ? `المجموع: $${total.toFixed(2)}` : `Total: $${total.toFixed(2)}`;
+  }
+
+  clearCartBtn.addEventListener('click', () => {
+    cart = [];
+    saveCart();
+    renderCart();
+  });
+
+  // تحميل المنتجات عند بدء الصفحة
   loadProducts();
+  renderCart();
+
 </script>
 
 </body>
