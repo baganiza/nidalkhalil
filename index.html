@@ -1,81 +1,138 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
+<meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>My Store</title>
+<title>My Store — Checkout + Payments</title>
 <style>
-  body {
-    font-family: Arial, sans-serif;
-    margin: 0; padding: 0;
-    background: #f7f7f7;
+  /* ---------- Base ---------- */
+  :root {
+    --brand:#2978f0;
+    --accent:#febd69;
+    --card-bg:#ffffff;
+    --page-bg:#f0f4f8;
   }
-  header {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 10px 20px;
-    background: #232f3e; color: white;
-    flex-wrap: wrap;
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:Inter, Arial, sans-serif;
+    background:var(--page-bg);
+    color:#222;
+    padding:12px;
   }
-  header h1 {
-    font-size: 20px; margin: 0;
+
+  /* header */
+  header{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    justify-content:space-between;
+    background:var(--brand);
+    color:#fff;
+    padding:10px 12px;
+    border-radius:8px;
+    margin-bottom:12px;
   }
-  #langToggle {
-    padding: 6px 10px; font-size: 14px; cursor: pointer;
-    border: none; background: #febd69; color: #111; border-radius: 4px;
+  header h1{font-size:18px; margin:0}
+  .header-right{display:flex; gap:8px; align-items:center;}
+  .btn{
+    background:var(--accent);
+    color:#111;
+    border:none;
+    padding:6px 10px;
+    border-radius:6px;
+    cursor:pointer;
+    font-weight:600;
   }
-  #cartIcon {
-    display: flex; align-items: center; gap: 6px;
-    cursor: pointer; background: none; border: none; color: white;
-    font-size: 14px;
+
+  /* products grid */
+  #productsContainer{
+    display:grid;
+    gap:10px;
+    /* Force 3 columns everywhere (including phones) as requested */
+    grid-template-columns: repeat(3, 1fr);
+    align-items:stretch;
   }
-  #cartCount {
-    background: gold; color: black; padding: 2px 6px; border-radius: 50%;
-    font-size: 12px; font-weight: bold;
+  .product{
+    background:var(--card-bg);
+    padding:8px;
+    border-radius:8px;
+    box-shadow:0 2px 6px rgba(0,0,0,0.08);
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    min-height:120px;
+    font-size:14px;
   }
-  #productsContainer {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 15px;
-    padding: 20px;
+  .product h3{margin:4px 0; font-size:14px; color:#0b3d91}
+  .product p{margin:2px 0; font-size:12px; color:#444}
+  .product .meta{font-size:12px; color:#666; margin-top:6px}
+  .product .controls{display:flex; gap:8px; align-items:center; margin-top:8px; justify-content:space-between}
+  .small-btn{
+    padding:6px 8px;
+    font-size:12px;
+    border-radius:6px;
+    border:none;
+    cursor:pointer;
+    background:var(--accent);
+    font-weight:600;
   }
-  .product {
-    background: white; border-radius: 8px; padding: 10px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    transition: transform 0.2s, box-shadow 0.2s;
+  .qty-badge{
+    background:#eee; padding:4px 8px; border-radius:999px; font-size:12px;
   }
-  .product:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+
+  /* cart modal */
+  #cartModal{
+    position:fixed;
+    right:12px;
+    top:72px;
+    width:320px;
+    max-height:75vh;
+    overflow:auto;
+    background:var(--card-bg);
+    padding:12px;
+    border-radius:10px;
+    box-shadow:0 6px 20px rgba(0,0,0,0.2);
+    display:none;
+    z-index:1200;
   }
-  .product h3 {
-    margin: 5px 0; font-size: 16px;
+  #cartModal h3{margin:0 0 8px 0; color:var(--brand)}
+  .cart-item{display:flex; gap:8px; align-items:center; justify-content:space-between; padding:6px 0; border-bottom:1px solid #eee; font-size:13px}
+  #cart-total{font-weight:700; color:red; background:#fff0f0; padding:8px; border-radius:6px; text-align:center; margin-top:8px}
+
+  /* payment modal (overlay) */
+  .overlay{position:fixed; inset:0; background:rgba(0,0,0,0.45); display:none; align-items:center; justify-content:center; z-index:1300}
+  .modal{
+    width:calc(100% - 40px);
+    max-width:720px;
+    background:#fff;
+    border-radius:10px;
+    padding:18px;
+    max-height:85vh;
+    overflow:auto;
   }
-  .product p {
-    margin: 3px 0; font-size: 14px; color: #333;
-  }
-  .add-to-cart {
-    display: inline-block; padding: 4px 8px;
-    background: #febd69; color: #111; border: none; border-radius: 4px;
-    font-size: 12px; cursor: pointer; margin-top: 5px;
-  }
-  /* Shopping cart modal */
-  #cartModal {
-    position: fixed; right: 10px; top: 60px;
-    background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-    padding: 15px; width: 300px; max-height: 80vh; overflow-y: auto;
-    display: none; z-index: 999;
-  }
-  #cartItems p { font-size: 14px; }
-  #total {
-    font-size: 16px; font-weight: bold; color: red; text-align: center;
-    background: #ffeaea; padding: 5px; border-radius: 4px; margin-top: 10px;
-  }
-  /* Responsive adjustments */
-  @media (max-width: 768px) {
-    header h1 { font-size: 16px; }
-    .product h3 { font-size: 14px; }
-    .product p { font-size: 12px; }
-    .add-to-cart { font-size: 10px; padding: 3px 6px; }
+  .modal h2{margin-top:0}
+  .payment-methods{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px}
+  .pm-btn{padding:8px 12px; border-radius:8px; border:1px solid #ddd; background:#fafafa; cursor:pointer}
+  .pm-btn.active{border-color:var(--brand); box-shadow:0 4px 12px rgba(41,120,240,0.12)}
+
+  .pm-details{margin-top:12px}
+  .pm-details label{display:block; font-size:13px; margin-top:8px}
+  .pm-details input{width:100%; padding:8px; border-radius:6px; border:1px solid #ddd; margin-top:6px}
+
+  .modal-actions{display:flex; gap:8px; justify-content:flex-end; margin-top:12px}
+  .primary{background:var(--brand); color:#fff; border:none; padding:8px 14px; border-radius:6px; cursor:pointer}
+
+  /* smaller styles for very small screens (reduce paddings, font-sizes) */
+  @media (max-width:420px){
+    body{padding:8px}
+    header h1{font-size:16px}
+    .product{padding:6px; font-size:12px; min-height:100px}
+    .product h3{font-size:13px}
+    .product p{font-size:11px}
+    .small-btn{font-size:11px; padding:5px 6px}
+    #cartModal{width:280px; right:8px; top:64px}
+    .modal{padding:12px}
   }
 </style>
 </head>
@@ -83,113 +140,447 @@
 
 <header>
   <h1 id="title">My Store</h1>
-  <button id="langToggle">عربي</button>
-  <button id="cartIcon">
-    🛒 <span id="cartCount">0</span>
-  </button>
+  <div class="header-right">
+    <button id="langToggle" class="btn">عربي</button>
+    <button id="openCart" class="btn">🛒 Cart <span id="cartCount" style="background:gold;padding:2px 6px;border-radius:999px;margin-left:6px;font-weight:700;color:#000">0</span></button>
+  </div>
 </header>
 
-<div id="productsContainer">
-  <!-- Products will be loaded here -->
+<main>
+  <section id="productsContainer" aria-live="polite">
+    <!-- products loaded here -->
+  </section>
+</main>
+
+<!-- cart modal (small panel) -->
+<div id="cartModal" role="dialog" aria-modal="false" aria-label="Shopping cart">
+  <h3>Your Cart</h3>
+  <div id="cartItemsList">Cart is empty</div>
+  <div id="cart-total">Total: $0.00</div>
+  <div style="margin-top:10px; display:flex; gap:8px;">
+    <button id="continueShopping" class="small-btn">Continue</button>
+    <button id="beginCheckout" class="small-btn" style="background:var(--brand); color:#fff">Checkout</button>
+  </div>
 </div>
 
-<div id="cartModal">
-  <h3 style="text-align:center; font-size:16px;">Shopping Cart</h3>
-  <div id="cartItems"></div>
-  <div id="total">Total: $0</div>
-  <button style="width:100%; margin-top:10px; background:#232f3e; color:white; padding:8px; border:none; border-radius:4px;">
-    Checkout
-  </button>
+<!-- overlay + payment modal -->
+<div id="overlay" class="overlay" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-label="Payment">
+    <h2>Checkout — Payment</h2>
+    <div>
+      <strong id="orderSummaryTitle">Order summary</strong>
+      <div id="orderSummary" style="margin:8px 0; font-size:13px; color:#333"></div>
+    </div>
+
+    <div>
+      <div style="margin-top:10px; font-weight:700">Choose payment method</div>
+      <div class="payment-methods" id="pmList">
+        <button class="pm-btn" data-method="cash">Cash on Delivery</button>
+        <button class="pm-btn" data-method="bank">Bank Transfer</button>
+        <button class="pm-btn" data-method="stcpay">STC Pay</button>
+        <button class="pm-btn" data-method="paypal">PayPal</button>
+        <button class="pm-btn" data-method="card">Card</button>
+      </div>
+
+      <div class="pm-details" id="pmDetails">
+        <!-- dynamic fields shown here -->
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button id="cancelPayment" class="small-btn">Cancel</button>
+      <button id="confirmPayment" class="primary">Confirm & Pay</button>
+    </div>
+  </div>
 </div>
 
-<!-- Firebase SDK -->
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
+<!-- EmailJS (for sending invoice email) -->
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+
 <script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyCcWgFDzs95TbVU7v5h_5O0lNzZvBlL90o",
-    authDomain: "baganiza-66bf0.firebaseapp.com",
-    projectId: "baganiza-66bf0",
-    storageBucket: "baganiza-66bf0.firebasestorage.app",
-    messagingSenderId: "1016966032123",
-    appId: "1:1016966032123:web:fbffd397c7d8494fa79e5e"
+/* =========================
+   CONFIGURATION - REPLACE!
+   =========================
+- ضع هنا إعدادات Firebase الخاصة بمشروعك
+- ضع قيم EmailJS USER_ID, SERVICE_ID, TEMPLATE_ID
+*/
+const firebaseConfig = {
+  apiKey: "AIzaSyCcWgFDzs95TbVU7v5h_5O0lNzZvBlL90o",
+  authDomain: "baganiza-66bf0.firebaseapp.com",
+  projectId: "baganiza-66bf0",
+  storageBucket: "baganiza-66bf0.firebasestorage.app",
+  messagingSenderId: "1016966032123",
+  appId: "1:1016966032123:web:fbffd397c7d8494fa79e5e"
+};
+
+const EMAILJS_USER_ID = "REPLACE_WITH_EMAILJS_USERID";
+const EMAILJS_SERVICE_ID = "REPLACE_WITH_EMAILJS_SERVICEID";
+const EMAILJS_TEMPLATE_ID = "REPLACE_WITH_EMAILJS_TEMPLATEID";
+
+/* -------------------------
+   Initialize services
+   -------------------------*/
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// init EmailJS
+if (typeof emailjs !== 'undefined') {
+  emailjs.init(EMAILJS_USER_ID);
+}
+
+/* -------------------------
+   App state
+   -------------------------*/
+let PRODUCTS = [];      // loaded from Firestore
+let CART = {};          // { productId: {product, qty} }
+let currentLang = 'en';
+
+/* -------------------------
+   DOM refs
+   -------------------------*/
+const productsContainer = document.getElementById('productsContainer');
+const openCartBtn = document.getElementById('openCart');
+const cartModal = document.getElementById('cartModal');
+const cartItemsList = document.getElementById('cartItemsList');
+const cartTotalEl = document.getElementById('cart-total');
+const cartCountEl = document.getElementById('cartCount');
+const beginCheckoutBtn = document.getElementById('beginCheckout');
+const continueShoppingBtn = document.getElementById('continueShopping');
+
+const overlay = document.getElementById('overlay');
+const pmList = document.getElementById('pmList');
+const pmDetails = document.getElementById('pmDetails');
+const orderSummary = document.getElementById('orderSummary');
+const orderSummaryTitle = document.getElementById('orderSummaryTitle');
+const cancelPaymentBtn = document.getElementById('cancelPayment');
+const confirmPaymentBtn = document.getElementById('confirmPayment');
+const langToggle = document.getElementById('langToggle');
+const title = document.getElementById('title');
+
+/* =========================
+   UI helpers
+   =========================*/
+function formatCurrency(n){ return '$' + Number(n).toFixed(2); }
+
+function updateCartUI(){
+  const items = Object.values(CART);
+  if (items.length === 0) {
+    cartItemsList.innerHTML = '<em>Cart is empty</em>';
+    cartTotalEl.textContent = 'Total: $0.00';
+    cartCountEl.textContent = '0';
+    return;
+  }
+  cartItemsList.innerHTML = '';
+  let total = 0;
+  items.forEach(({product, qty}) => {
+    const div = document.createElement('div');
+    div.className = 'cart-item';
+    const name = document.createElement('div');
+    name.textContent = product.name;
+    const right = document.createElement('div');
+    right.style.display = 'flex';
+    right.style.gap = '8px';
+    right.style.alignItems = 'center';
+    const q = document.createElement('div'); q.textContent = 'x' + qty; q.style.fontSize='13px';
+    const price = document.createElement('div'); price.textContent = formatCurrency(product.price * qty);
+    const rm = document.createElement('button'); rm.textContent='×'; rm.className='small-btn'; rm.style.padding='2px 6px';
+    rm.onclick = ()=>{ removeFromCart(product.id); };
+    right.appendChild(q); right.appendChild(price); right.appendChild(rm);
+    div.appendChild(name); div.appendChild(right);
+    cartItemsList.appendChild(div);
+    total += product.price * qty;
+  });
+  cartTotalEl.textContent = 'Total: ' + total.toFixed(2) + ' $';
+  cartCountEl.textContent = items.reduce((a,b)=>a+b.qty,0);
+}
+
+/* =========================
+   Products: load & render
+   =========================*/
+async function loadProducts(){
+  productsContainer.innerHTML = 'Loading products...';
+  try{
+    const snap = await db.collection('products').get();
+    PRODUCTS = [];
+    snap.forEach(doc => {
+      const p = doc.data();
+      p.id = doc.id;
+      // ensure numeric price
+      p.price = Number(p.price) || 0;
+      PRODUCTS.push(p);
+    });
+    renderProducts();
+  }catch(err){
+    productsContainer.innerHTML = 'Failed to load products.';
+    console.error(err);
+  }
+}
+
+function renderProducts(){
+  productsContainer.innerHTML = '';
+  if (!PRODUCTS.length){
+    productsContainer.innerHTML = '<p>No products</p>';
+    return;
+  }
+  PRODUCTS.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'product';
+    card.innerHTML = `
+      <div>
+        <h3>${escapeHtml(p.name)}</h3>
+        <p class="meta">${escapeHtml(p.description || '')}</p>
+      </div>
+      <div style="margin-top:6px">
+        <div style="display:flex; align-items:center; justify-content:space-between;">
+          <div style="font-weight:700; color:var(--brand)">${formatCurrency(p.price)}</div>
+          <div style="font-size:12px; color:#666">${escapeHtml(p.category || '')}</div>
+        </div>
+        <div class="controls">
+          <button class="small-btn addBtn">Add</button>
+          <div class="qty-badge" aria-hidden="true">•</div>
+        </div>
+      </div>
+    `;
+    const addBtn = card.querySelector('.addBtn');
+    addBtn.onclick = ()=> addToCart(p);
+    productsContainer.appendChild(card);
+  });
+}
+
+/* simple escape to avoid HTML injection from DB */
+function escapeHtml(s){ return String(s || '').replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[c]); }
+
+/* =========================
+   Cart operations
+   =========================*/
+function addToCart(product){
+  if (!CART[product.id]) CART[product.id] = {product, qty:0};
+  CART[product.id].qty += 1;
+  updateCartUI();
+}
+
+function removeFromCart(productId){
+  delete CART[productId];
+  updateCartUI();
+}
+
+/* =========================
+   Cart modal toggles
+   =========================*/
+openCartBtn.addEventListener('click', ()=>{
+  cartModal.style.display = cartModal.style.display === 'block' ? 'none' : 'block';
+});
+continueShoppingBtn.addEventListener('click', ()=> cartModal.style.display = 'none');
+
+/* =========================
+   Checkout flow: show payment modal
+   =========================*/
+beginCheckoutBtn.addEventListener('click', ()=> {
+  // build order summary
+  const items = Object.values(CART);
+  if (items.length === 0){
+    alert('Cart is empty!');
+    return;
+  }
+  let total = 0;
+  let summaryHtml = '';
+  items.forEach(({product, qty})=>{
+    const line = `${escapeHtml(product.name)} x${qty} — ${formatCurrency(product.price * qty)}<br/>`;
+    summaryHtml += line;
+    total += product.price * qty;
+  });
+  summaryHtml += `<hr><div style="font-weight:700">Total: ${formatCurrency(total)}</div>`;
+  orderSummary.innerHTML = summaryHtml;
+  // show overlay/modal
+  overlay.style.display = 'flex';
+  overlay.setAttribute('aria-hidden','false');
+  // set default active payment
+  setActivePayment('cash');
+});
+
+/* payment method selection */
+let selectedPayment = 'cash';
+pmList.addEventListener('click', (e)=>{
+  const btn = e.target.closest('.pm-btn');
+  if(!btn) return;
+  const method = btn.dataset.method;
+  setActivePayment(method);
+});
+
+function setActivePayment(method){
+  selectedPayment = method;
+  // highlight active
+  document.querySelectorAll('.pm-btn').forEach(b=> b.classList.toggle('active', b.dataset.method===method));
+  // render fields
+  renderPaymentFields(method);
+}
+
+function renderPaymentFields(method){
+  pmDetails.innerHTML = ''; // clear
+  if (method === 'cash'){
+    pmDetails.innerHTML = `<div>Pay when the courier delivers the order (Cash on Delivery)</div>`;
+  } else if (method === 'bank'){
+    pmDetails.innerHTML = `
+      <label>Bank Name<input type="text" id="bankName" /></label>
+      <label>Account Number<input type="text" id="bankAccount" /></label>
+      <label>Beneficiary Name<input type="text" id="bankBeneficiary" /></label>
+    `;
+  } else if (method === 'stcpay'){
+    pmDetails.innerHTML = `
+      <label>STC Pay Phone<input id="stcPhone" type="tel" placeholder="+9665XXXXXXXX" /></label>
+    `;
+  } else if (method === 'paypal'){
+    pmDetails.innerHTML = `
+      <label>PayPal Email<input id="paypalEmail" type="email" placeholder="email@example.com" /></label>
+    `;
+  } else if (method === 'card'){
+    pmDetails.innerHTML = `
+      <label>Card Number<input id="cardNumber" maxlength="19" placeholder="1234 5678 9012 3456" /></label>
+      <label>Expiry<input id="cardExpiry" type="month" /></label>
+      <label>CVC<input id="cardCVC" maxlength="4" /></label>
+    `;
+  }
+}
+
+/* cancel payment */
+cancelPaymentBtn.addEventListener('click', ()=> {
+  overlay.style.display = 'none';
+  overlay.setAttribute('aria-hidden','true');
+});
+
+/* =========================
+   Confirm payment: validate, save to Firestore, send email via EmailJS
+   =========================*/
+confirmPaymentBtn.addEventListener('click', async ()=> {
+  // validate cart
+  const items = Object.values(CART);
+  if(items.length === 0) { alert('Cart empty'); return; }
+
+  // gather payment data
+  const paymentData = { method: selectedPayment };
+  let valid = true;
+  if (selectedPayment === 'bank'){
+    paymentData.bankName = document.getElementById('bankName')?.value?.trim();
+    paymentData.bankAccount = document.getElementById('bankAccount')?.value?.trim();
+    if(!paymentData.bankName || !paymentData.bankAccount){ valid=false; alert('Please fill bank details'); return;}
+  } else if (selectedPayment === 'stcpay'){
+    paymentData.stcPhone = document.getElementById('stcPhone')?.value?.trim();
+    if(!paymentData.stcPhone){ valid=false; alert('Please enter STC Pay phone'); return;}
+  } else if (selectedPayment === 'paypal'){
+    paymentData.paypalEmail = document.getElementById('paypalEmail')?.value?.trim();
+    if(!paymentData.paypalEmail){ valid=false; alert('Please enter PayPal email'); return;}
+  } else if (selectedPayment === 'card'){
+    paymentData.cardNumber = document.getElementById('cardNumber')?.value?.trim();
+    paymentData.cardExpiry = document.getElementById('cardExpiry')?.value?.trim();
+    paymentData.cardCVC = document.getElementById('cardCVC')?.value?.trim();
+    if(!paymentData.cardNumber || !paymentData.cardExpiry || !paymentData.cardCVC){ valid=false; alert('Please enter card details'); return;}
+    // NOTE: Do NOT process card payments directly in client side for production.
+  }
+
+  // build order object
+  const orderItems = items.map(({product, qty}) => ({
+    id: product.id,
+    name: product.name,
+    price: product.price,
+    qty
+  }));
+  const totalAmount = orderItems.reduce((s,i)=> s + i.price * i.qty, 0);
+
+  const order = {
+    createdAt: new Date(),
+    items: orderItems,
+    payment: paymentData,
+    total: totalAmount,
+    status: 'pending'
   };
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
 
-  let currentLang = 'en';
-  let cart = [];
+  try{
+    // save to Firestore
+    const docRef = await db.collection('orders').add(order);
+    const orderId = docRef.id;
 
-  const productsContainer = document.getElementById('productsContainer');
-  const langToggle = document.getElementById('langToggle');
-  const title = document.getElementById('title');
-  const cartIcon = document.getElementById('cartIcon');
-  const cartModal = document.getElementById('cartModal');
-  const cartItems = document.getElementById('cartItems');
-  const totalEl = document.getElementById('total');
-  const cartCount = document.getElementById('cartCount');
+    // generate invoice text/HTML
+    let invoiceText = `Order ID: ${orderId}\n\nItems:\n`;
+    orderItems.forEach(it => {
+      invoiceText += `${it.name} x${it.qty} = $${(it.price * it.qty).toFixed(2)}\n`;
+    });
+    invoiceText += `\nTotal: $${totalAmount.toFixed(2)}\nPayment method: ${selectedPayment}\n\nThank you!`;
 
-  langToggle.addEventListener('click', () => {
-    currentLang = currentLang === 'en' ? 'ar' : 'en';
-    if(currentLang === 'ar'){
-      title.textContent = 'متجري';
-      langToggle.textContent = 'English';
-      document.body.dir = 'rtl';
-    } else {
-      title.textContent = 'My Store';
-      langToggle.textContent = 'عربي';
-      document.body.dir = 'ltr';
-    }
-    loadProducts();
-  });
-
-  cartIcon.addEventListener('click', () => {
-    cartModal.style.display = cartModal.style.display === 'block' ? 'none' : 'block';
-  });
-
-  function loadProducts(){
-    productsContainer.innerHTML = 'Loading products...';
-    db.collection('products').get().then(snapshot => {
-      productsContainer.innerHTML = '';
-      if(snapshot.empty){
-        productsContainer.textContent = currentLang === 'ar' ? 'لا توجد منتجات.' : 'No products found.';
-        return;
+    // send email via EmailJS (if configured)
+    if (typeof emailjs !== 'undefined' && EMAILJS_USER_ID !== 'REPLACE_WITH_EMAILJS_USERID') {
+      const toEmail = prompt('Enter email to send invoice to (for demo):');
+      if (toEmail && /\S+@\S+\.\S+/.test(toEmail)) {
+        const templateParams = {
+          to_email: toEmail,
+          order_id: orderId,
+          message: invoiceText,
+          total: totalAmount.toFixed(2)
+        };
+        try{
+          await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams);
+          alert('Order saved & invoice sent by email!');
+        }catch(e){
+          console.warn('EmailJS failed', e);
+          alert('Order saved but failed to send email.');
+        }
+      } else {
+        alert('Order saved (no email sent). Order ID: ' + orderId);
       }
-      snapshot.forEach(doc => {
-        const product = doc.data();
-        const productDiv = document.createElement('div');
-        productDiv.className = 'product';
-        productDiv.innerHTML = `
-          <h3>${product.name}</h3>
-          <p><strong>${currentLang === 'ar' ? 'السعر' : 'Price'}:</strong> $${product.price}</p>
-          <p>${product.description}</p>
-          <button class="add-to-cart">${currentLang === 'ar' ? 'أضف للسلة' : 'Add to Cart'}</button>
-        `;
-        productDiv.querySelector('.add-to-cart').addEventListener('click', () => addToCart(product));
-        productsContainer.appendChild(productDiv);
-      });
-    });
-  }
+    } else {
+      alert('Order saved. Order ID: ' + orderId + '\n(EmailJS not configured)');
+    }
 
-  function addToCart(product){
-    cart.push(product);
+    // clear cart & close modal
+    CART = {};
     updateCartUI();
+    overlay.style.display = 'none';
+    overlay.setAttribute('aria-hidden','true');
+    cartModal.style.display = 'none';
+  }catch(err){
+    console.error('Order save failed', err);
+    alert('Failed to save order: ' + err.message);
   }
+});
 
-  function updateCartUI(){
-    cartItems.innerHTML = '';
-    let total = 0;
-    cart.forEach(item => {
-      cartItems.innerHTML += `<p>${item.name} - $${item.price}</p>`;
-      total += parseFloat(item.price);
-    });
-    totalEl.textContent = `${currentLang === 'ar' ? 'المجموع' : 'Total'}: $${total.toFixed(2)}`;
-    cartCount.textContent = cart.length;
+/* =========================
+   Language toggle (simple)
+   =========================*/
+langToggle.addEventListener('click', ()=>{
+  if(currentLang === 'en'){
+    currentLang = 'ar';
+    title.textContent = 'متجري';
+    langToggle.textContent = 'EN';
+    document.documentElement.dir = 'rtl';
+  } else {
+    currentLang = 'en';
+    title.textContent = 'My Store';
+    langToggle.textContent = 'عربي';
+    document.documentElement.dir = 'ltr';
   }
+  renderProducts();
+});
 
-  loadProducts();
+/* =========================
+   Utility: force 3 columns on tiny phones
+   (This keeps 3 columns even on very small widths, while shrinking cards)
+   =========================*/
+(function enforceThreeColumnsOnSmallScreens(){
+  /* grid-template already set to repeat(3,1fr) so browsers will try to squeeze.
+     If you need absolute control, you can add special CSS via JS here.
+     For now existing CSS handles shrinking on small screens via @media.
+  */
+})();
+
+/* =========================
+   Initial load
+   =========================*/
+loadProducts();
+updateCartUI();
+
 </script>
-
 </body>
 </html>
