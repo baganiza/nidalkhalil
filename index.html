@@ -225,6 +225,22 @@
     font-weight: 600;
   }
 
+  #paymentInputs > div {
+    margin: 10px 0;
+  }
+  #paymentInputs label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  #paymentInputs input {
+    width: 100%;
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+  }
+
   #checkoutBtn {
     margin-top: 20px;
     width: 100%;
@@ -239,6 +255,17 @@
   }
   #checkoutBtn:hover {
     background-color: #1e56b7;
+  }
+
+  #invoice {
+    margin-top: 20px;
+    background: #e0f7fa;
+    padding: 15px;
+    border-radius: 10px;
+    font-size: 1rem;
+    color: #00796b;
+    display: none;
+    white-space: pre-wrap;
   }
 </style>
 </head>
@@ -280,149 +307,103 @@
       <label><input type="radio" name="payment" value="card" /> Credit Card</label>
     </section>
 
-    <button id="checkoutBtn" aria-label="Proceed to checkout">Checkout</button>
+    <div id="paymentInputs">
+      <div id="bankInput" style="display:none;">
+        <label for="bankAccount">Bank Account Number</label>
+        <input type="text" id="bankAccount" placeholder="Enter bank account number" />
+      </div>
+      <div id="stcpayInput" style="display:none;">
+        <label for="stcpayNumber">STC Pay Mobile Number</label>
+        <input type="text" id="stcpayNumber" placeholder="Enter STC Pay mobile number" />
+      </div>
+      <div id="paypalInput" style="display:none;">
+        <label for="paypalEmail">PayPal Email</label>
+        <input type="email" id="paypalEmail" placeholder="Enter PayPal email" />
+      </div>
+      <div id="cardInput" style="display:none;">
+        <label for="cardNumber">Card Number</label>
+        <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19" />
+        <label for="cardExpiry">Expiry Date</label>
+        <input type="month" id="cardExpiry" />
+        <label for="cardCVC">CVC</label>
+        <input type="text" id="cardCVC" placeholder="123" maxlength="4" />
+      </div>
+    </div>
+
+    <button id="checkoutBtn">Checkout</button>
+
+    <pre id="invoice" aria-live="polite"></pre>
   </aside>
 </div>
 
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-
 <script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyCcWgFDzs95TbVU7v5h_5O0lNzZvBlL90o",
-    authDomain: "baganiza-66bf0.firebaseapp.com",
-    projectId: "baganiza-66bf0",
-    storageBucket: "baganiza-66bf0.firebasestorage.app",
-    messagingSenderId: "1016966032123",
-    appId: "1:1016966032123:web:fbffd397c7d8494fa79e5e"
-  };
+  // Products and Cart Data
+  let products = [
+    {id: '1', name: 'Apple iPhone 13', price: 799, description: 'Latest Apple iPhone with A15 chip', category: 'Phones'},
+    {id: '2', name: 'Samsung Galaxy S21', price: 699, description: 'Samsung flagship phone', category: 'Phones'},
+    {id: '3', name: 'Apple AirPods Pro', price: 249, description: 'Noise-cancelling wireless earbuds', category: 'Accessories'},
+    {id: '4', name: 'Dell XPS 13 Laptop', price: 999, description: 'Powerful and compact laptop', category: 'Computers'},
+    {id: '5', name: 'Apple MacBook Air', price: 1099, description: 'Lightweight MacBook with M1 chip', category: 'Computers'},
+    {id: '6', name: 'Sony WH-1000XM4', price: 349, description: 'Top noise-cancelling headphones', category: 'Accessories'}
+  ];
 
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-
-  let currentLang = 'en';
-
+  // UI elements
   const productsContainer = document.getElementById('productsContainer');
-  const langToggle = document.getElementById('langToggle');
-  const title = document.getElementById('title');
-  const searchInput = document.getElementById('searchInput');
-  const categorySelect = document.getElementById('categorySelect');
-
-  const cartIconContainer = document.getElementById('cartIconContainer');
-  const cartCount = document.getElementById('cartCount');
   const cartItemsDiv = document.getElementById('cartItems');
+  const cartCount = document.getElementById('cartCount');
   const totalPriceDiv = document.getElementById('totalPrice');
-  const checkoutBtn = document.getElementById('checkoutBtn');
 
-  let products = [];
+  const paymentRadios = document.querySelectorAll('input[name="payment"]');
+  const bankInputDiv = document.getElementById('bankInput');
+  const stcpayInputDiv = document.getElementById('stcpayInput');
+  const paypalInputDiv = document.getElementById('paypalInput');
+  const cardInputDiv = document.getElementById('cardInput');
+
+  const checkoutBtn = document.getElementById('checkoutBtn');
+  const invoicePre = document.getElementById('invoice');
+
   let cartItems = {};
 
-  langToggle.addEventListener('click', () => {
-    currentLang = currentLang === 'en' ? 'ar' : 'en';
-    if(currentLang === 'ar'){
-      title.textContent = 'متجري';
-      langToggle.textContent = 'English';
-      document.body.dir = 'rtl';
-      searchInput.placeholder = 'ابحث عن المنتجات...';
-      categorySelect.options[0].text = 'كل التصنيفات';
-      renderProducts();
-    } else {
-      title.textContent = 'My Store';
-      langToggle.textContent = 'عربي';
-      document.body.dir = 'ltr';
-      searchInput.placeholder = 'Search products...';
-      categorySelect.options[0].text = 'All Categories';
-      renderProducts();
-    }
-  });
-
-  // تحميل المنتجات من Firestore
-  function loadProducts(){
-    db.collection('products').get().then(snapshot => {
-      products = [];
-      const categories = new Set();
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        products.push({...data, id: doc.id});
-        categories.add(data.category || 'Uncategorized');
-      });
-
-      // ملء قائمة التصنيفات
-      categorySelect.innerHTML = '';
-      const defaultOption = document.createElement('option');
-      defaultOption.value = '';
-      defaultOption.textContent = currentLang === 'ar' ? 'كل التصنيفات' : 'All Categories';
-      categorySelect.appendChild(defaultOption);
-
-      categories.forEach(cat => {
-        const option = document.createElement('option');
-        option.value = cat;
-        option.textContent = cat;
-        categorySelect.appendChild(option);
-      });
-
-      renderProducts();
-    });
-  }
-
-  function renderProducts(){
-    const searchTerm = searchInput.value.toLowerCase();
-    const selectedCategory = categorySelect.value;
-
-    let filtered = products.filter(p => {
-      const matchesSearch = p.name.toLowerCase().includes(searchTerm) || (p.description && p.description.toLowerCase().includes(searchTerm));
-      const matchesCategory = selectedCategory === '' || p.category === selectedCategory;
-      return matchesSearch && matchesCategory;
-    });
-
-    // ترتيب المنتجات حسب الاسم لتكون المتشابهة جنب بعض
-    filtered.sort((a,b) => a.name.localeCompare(b.name));
-
+  // Render products in grid with 3 per row
+  function renderProducts() {
     productsContainer.innerHTML = '';
-
-    if(filtered.length === 0){
-      productsContainer.textContent = currentLang === 'ar' ? 'لا توجد منتجات.' : 'No products found.';
-      return;
-    }
-
-    filtered.forEach(product => {
+    products.forEach(product => {
       const div = document.createElement('div');
       div.className = 'product';
       div.innerHTML = `
         <h3>${product.name}</h3>
-        <p><strong>${currentLang === 'ar' ? 'السعر' : 'Price'}:</strong> $${product.price.toFixed(2)}</p>
-        <p>${product.description || ''}</p>
-        <button aria-label="Add ${product.name} to cart">${currentLang === 'ar' ? 'أضف للسلة' : 'Add to Cart'}</button>
+        <p><strong>Price:</strong> $${product.price.toFixed(2)}</p>
+        <p>${product.description}</p>
+        <button>Add to Cart</button>
       `;
-      const btn = div.querySelector('button');
-      btn.addEventListener('click', () => addToCart(product));
+      div.querySelector('button').addEventListener('click', () => addToCart(product));
       productsContainer.appendChild(div);
     });
   }
 
   function addToCart(product){
     if(cartItems[product.id]){
-      cartItems[product.id].qty += 1;
+      cartItems[product.id].qty++;
     } else {
-      cartItems[product.id] = { ...product, qty: 1 };
+      cartItems[product.id] = {...product, qty: 1};
     }
     renderCart();
   }
 
-  function removeFromCart(productId){
-    delete cartItems[productId];
+  function removeFromCart(id){
+    delete cartItems[id];
     renderCart();
   }
 
   function renderCart(){
     const items = Object.values(cartItems);
-    cartCount.textContent = items.reduce((acc, item) => acc + item.qty, 0);
-    cartCount.style.display = items.length > 0 ? 'flex' : 'none';
+    cartCount.textContent = items.reduce((acc, i) => acc + i.qty, 0);
+    cartCount.style.display = items.length ? 'flex' : 'none';
 
     if(items.length === 0){
-      cartItemsDiv.textContent = currentLang === 'ar' ? 'السلة فارغة' : 'Cart is empty';
-      totalPriceDiv.textContent = currentLang === 'ar' ? 'المجموع: $0.00' : 'Total: $0.00';
+      cartItemsDiv.textContent = 'Cart is empty';
+      totalPriceDiv.textContent = 'Total: $0.00';
+      invoicePre.style.display = 'none';
       return;
     }
 
@@ -430,50 +411,112 @@
     let total = 0;
     items.forEach(item => {
       total += item.price * item.qty;
-      const itemDiv = document.createElement('div');
-      itemDiv.className = 'cart-item';
-      itemDiv.innerHTML = `
+      const div = document.createElement('div');
+      div.className = 'cart-item';
+      div.innerHTML = `
         <span class="cart-item-name">${item.name}</span>
         <span class="cart-item-qty">x${item.qty}</span>
         <span class="cart-item-price">$${(item.price * item.qty).toFixed(2)}</span>
-        <button class="remove-btn" aria-label="Remove ${item.name} from cart">&times;</button>
+        <button class="remove-btn" aria-label="Remove ${item.name}">&times;</button>
       `;
-      itemDiv.querySelector('button').addEventListener('click', () => removeFromCart(item.id));
-      cartItemsDiv.appendChild(itemDiv);
+      div.querySelector('button').addEventListener('click', () => removeFromCart(item.id));
+      cartItemsDiv.appendChild(div);
     });
 
-    totalPriceDiv.textContent = currentLang === 'ar' ? `المجموع: $${total.toFixed(2)}` : `Total: $${total.toFixed(2)}`;
+    totalPriceDiv.textContent = `Total: $${total.toFixed(2)}`;
+    invoicePre.style.display = 'none';
   }
+
+  // Show relevant payment input fields
+  function updatePaymentInputs(){
+    const selected = document.querySelector('input[name="payment"]:checked').value;
+    bankInputDiv.style.display = selected === 'bank' ? 'block' : 'none';
+    stcpayInputDiv.style.display = selected === 'stcpay' ? 'block' : 'none';
+    paypalInputDiv.style.display = selected === 'paypal' ? 'block' : 'none';
+    cardInputDiv.style.display = selected === 'card' ? 'block' : 'none';
+  }
+
+  paymentRadios.forEach(radio => {
+    radio.addEventListener('change', updatePaymentInputs);
+  });
 
   checkoutBtn.addEventListener('click', () => {
     if(Object.keys(cartItems).length === 0){
-      alert(currentLang === 'ar' ? 'السلة فارغة!' : 'Cart is empty!');
+      alert('Cart is empty!');
       return;
     }
-    const selectedMethod = document.querySelector('input[name="payment"]:checked').value;
-    alert(currentLang === 'ar' ? `طريقة الدفع: ${paymentMethodName(selectedMethod)}` : `Payment method: ${paymentMethodName(selectedMethod)}`);
-    // هنا يمكنك إضافة منطق الدفع
 
-    // تفريغ السلة بعد الدفع (اختياري)
+    const selected = document.querySelector('input[name="payment"]:checked').value;
+    // Validate inputs based on payment method
+    let paymentDetails = '';
+    if(selected === 'bank'){
+      const acc = document.getElementById('bankAccount').value.trim();
+      if(!acc){
+        alert('Please enter your bank account number.');
+        return;
+      }
+      paymentDetails = `Bank Account Number: ${acc}`;
+    } else if(selected === 'stcpay'){
+      const num = document.getElementById('stcpayNumber').value.trim();
+      if(!num){
+        alert('Please enter your STC Pay mobile number.');
+        return;
+      }
+      paymentDetails = `STC Pay Mobile Number: ${num}`;
+    } else if(selected === 'paypal'){
+      const email = document.getElementById('paypalEmail').value.trim();
+      if(!email || !email.includes('@')){
+        alert('Please enter a valid PayPal email.');
+        return;
+      }
+      paymentDetails = `PayPal Email: ${email}`;
+    } else if(selected === 'card'){
+      const cardNum = document.getElementById('cardNumber').value.trim();
+      const expiry = document.getElementById('cardExpiry').value;
+      const cvc = document.getElementById('cardCVC').value.trim();
+
+      if(cardNum.length < 12 || !expiry || cvc.length < 3){
+        alert('Please enter valid credit card details.');
+        return;
+      }
+      paymentDetails = `Card Number: ${cardNum}\nExpiry: ${expiry}\nCVC: ${cvc}`;
+    } else {
+      paymentDetails = 'Cash on Delivery';
+    }
+
+    // Generate invoice
+    const items = Object.values(cartItems);
+    let invoiceText = '--- Invoice ---\n\nItems:\n';
+    let total = 0;
+    items.forEach(i => {
+      invoiceText += `${i.name} x${i.qty} - $${(i.price * i.qty).toFixed(2)}\n`;
+      total += i.price * i.qty;
+    });
+    invoiceText += `\nTotal: $${total.toFixed(2)}\n\nPayment Method: ${paymentMethodName(selected)}\n${paymentDetails}\n\nThank you for your purchase!`;
+
+    invoicePre.textContent = invoiceText;
+    invoicePre.style.display = 'block';
+
+    // Optionally clear cart after checkout
     cartItems = {};
     renderCart();
   });
 
   function paymentMethodName(method){
     switch(method){
-      case 'cash': return currentLang === 'ar' ? 'الدفع عند الاستلام' : 'Cash on Delivery';
-      case 'bank': return currentLang === 'ar' ? 'تحويل بنكي' : 'Bank Transfer';
-      case 'stcpay': return currentLang === 'ar' ? 'STC Pay' : 'STC Pay';
+      case 'cash': return 'Cash on Delivery';
+      case 'bank': return 'Bank Transfer';
+      case 'stcpay': return 'STC Pay';
       case 'paypal': return 'PayPal';
-      case 'card': return currentLang === 'ar' ? 'بطاقة ائتمان' : 'Credit Card';
+      case 'card': return 'Credit Card';
       default: return method;
     }
   }
 
-  searchInput.addEventListener('input', renderProducts);
-  categorySelect.addEventListener('change', renderProducts);
-
-  loadProducts();
+  // Initial render
+  renderProducts();
+  renderCart();
+  updatePaymentInputs();
 </script>
 
 </body>
