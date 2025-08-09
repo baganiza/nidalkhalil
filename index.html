@@ -5,31 +5,53 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>My Store - متجر إلكتروني</title>
 <style>
-  /* الخطوط والألوان العامة */
+  /* خطوط Google Roboto */
   @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+  /* reset بسيط */
+  * {
+    box-sizing: border-box;
+  }
+
   body {
     font-family: 'Roboto', Arial, sans-serif;
-    background: #f0f2f5;
+    background: linear-gradient(135deg, #4a90e2, #50e3c2);
     margin: 0;
-    padding: 0 10px 40px;
+    padding: 0;
     color: #1c1e21;
-    direction: ltr;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
   }
   body[dir="rtl"] {
     direction: rtl;
   }
-  /* رأس الصفحة */
-  header {
+
+  /* Container مركزي للصفحة */
+  .container {
     max-width: 1200px;
-    margin: 20px auto 30px;
+    margin: 20px auto 40px;
+    background: #fff;
+    border-radius: 10px;
+    padding: 20px 30px 40px;
+    box-shadow: 0 15px 40px rgb(0 0 0 / 0.15);
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Header */
+  header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 25px;
   }
   header h1 {
-    font-size: 28px;
+    font-size: 32px;
     color: #232f3e;
     font-weight: 700;
+    letter-spacing: 1px;
   }
   #langToggle {
     background-color: #232f3e;
@@ -37,63 +59,134 @@
     color: #fff;
     font-weight: 600;
     font-size: 14px;
-    padding: 8px 16px;
-    border-radius: 4px;
+    padding: 8px 20px;
+    border-radius: 30px;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    user-select: none;
   }
   #langToggle:hover {
     background-color: #37475a;
   }
-  /* المنتجات */
+
+  /* Search bar */
+  #searchBar {
+    margin-bottom: 20px;
+    display: flex;
+  }
+  #searchInput {
+    flex-grow: 1;
+    padding: 12px 15px;
+    font-size: 16px;
+    border: 2px solid #ddd;
+    border-radius: 30px 0 0 30px;
+    outline: none;
+    transition: border-color 0.3s ease;
+  }
+  #searchInput:focus {
+    border-color: #4a90e2;
+  }
+  #searchBtn {
+    background-color: #4a90e2;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 0 30px 30px 0;
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  #searchBtn:hover {
+    background-color: #357abd;
+  }
+
+  /* Main content flex */
+  .main-content {
+    display: flex;
+    gap: 25px;
+    flex-grow: 1;
+  }
+
+  /* Sidebar للتصفية */
+  .sidebar {
+    width: 220px;
+    background: #fafafa;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgb(0 0 0 / 0.07);
+    font-size: 14px;
+  }
+  .sidebar h3 {
+    font-weight: 700;
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #232f3e;
+  }
+  .filter-group {
+    margin-bottom: 25px;
+  }
+  .filter-group label {
+    display: block;
+    margin-bottom: 8px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .filter-group input[type="checkbox"] {
+    margin-right: 10px;
+    transform: scale(1.1);
+    vertical-align: middle;
+  }
+
+  /* Products grid */
   #productsContainer {
-    max-width: 1200px;
-    margin: auto;
+    flex-grow: 1;
     display: grid;
-    grid-template-columns: repeat(auto-fill,minmax(220px,1fr));
+    grid-template-columns: repeat(auto-fill,minmax(240px,1fr));
     gap: 20px;
   }
   .product {
     background: #fff;
-    border-radius: 8px;
+    border-radius: 10px;
     padding: 15px;
-    box-shadow: 0 4px 8px rgb(0 0 0 / 0.1);
+    box-shadow: 0 6px 18px rgb(0 0 0 / 0.12);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     transition: box-shadow 0.3s ease;
   }
   .product:hover {
-    box-shadow: 0 8px 20px rgb(0 0 0 / 0.15);
+    box-shadow: 0 10px 28px rgb(0 0 0 / 0.18);
   }
   .product h3 {
-    margin: 0 0 12px;
-    font-size: 18px;
+    margin: 0 0 10px;
+    font-size: 20px;
     color: #111;
-    height: 48px;
+    height: 56px;
     overflow: hidden;
   }
   .product p.description {
     flex-grow: 1;
     color: #555;
     font-size: 14px;
-    margin-bottom: 12px;
+    margin-bottom: 15px;
+    line-height: 1.3;
   }
   .product p.price {
     font-weight: 700;
-    font-size: 16px;
+    font-size: 18px;
     color: #b12704;
-    margin-bottom: 12px;
+    margin-bottom: 15px;
   }
   .product button {
     background-color: #ffd814;
     border: none;
-    font-weight: 600;
-    padding: 10px 0;
-    border-radius: 5px;
+    font-weight: 700;
+    padding: 12px 0;
+    border-radius: 8px;
     cursor: pointer;
     color: #111;
     transition: background-color 0.3s ease;
+    letter-spacing: 0.8px;
   }
   .product button:hover {
     background-color: #f7ca00;
@@ -101,28 +194,33 @@
 
   /* عربة التسوق */
   .cart {
-    max-width: 1200px;
     background: #fff;
-    margin: 30px auto 0;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
-    padding: 20px 30px;
+    border-radius: 10px;
+    box-shadow: 0 6px 20px rgb(0 0 0 / 0.12);
+    padding: 25px 30px;
+    width: 360px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
   }
   .cart h2 {
     font-size: 24px;
     color: #232f3e;
     margin-top: 0;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #e1e1e1;
+    padding-bottom: 8px;
   }
   #cartItems {
-    max-height: 320px;
+    max-height: 350px;
     overflow-y: auto;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
   }
   .cart-item {
     display: flex;
     justify-content: space-between;
     padding: 12px 0;
-    border-bottom: 1px solid #e1e1e1;
+    border-bottom: 1px solid #eee;
     align-items: center;
   }
   .cart-item:last-child {
@@ -144,10 +242,10 @@
     background: #e53935;
     border: none;
     color: white;
-    border-radius: 4px;
+    border-radius: 6px;
     font-weight: 700;
     cursor: pointer;
-    padding: 6px 12px;
+    padding: 6px 14px;
     transition: background 0.3s ease;
   }
   .cart-item button:hover {
@@ -155,27 +253,27 @@
   }
   .total {
     font-weight: 700;
-    font-size: 20px;
+    font-size: 22px;
     text-align: right;
     color: #232f3e;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
   }
 
   /* خيارات الدفع */
   #paymentOptions {
-    margin-bottom: 25px;
+    margin-bottom: 30px;
   }
   #paymentOptions label {
     display: block;
     font-weight: 600;
     font-size: 16px;
-    margin-bottom: 8px;
+    margin-bottom: 15px;
     cursor: pointer;
     user-select: none;
   }
   #paymentOptions input[type="radio"] {
-    margin-right: 8px;
-    transform: scale(1.2);
+    margin-right: 10px;
+    transform: scale(1.3);
     vertical-align: middle;
   }
 
@@ -184,10 +282,10 @@
     width: 100%;
     background-color: #ffd814;
     border: none;
-    padding: 14px 0;
-    font-size: 18px;
+    padding: 16px 0;
+    font-size: 20px;
     font-weight: 700;
-    border-radius: 5px;
+    border-radius: 10px;
     cursor: pointer;
     color: #111;
     transition: background-color 0.3s ease;
@@ -198,58 +296,125 @@
 
   /* رسالة الدفع */
   #paymentMessage {
-    margin-top: 20px;
+    margin-top: 30px;
+    background-color: #f0f4f8;
+    border-radius: 8px;
     padding: 20px;
-    background-color: #dff0d8;
-    color: #3c763d;
-    border-radius: 6px;
+    color: #232f3e;
     font-size: 16px;
-    line-height: 1.4;
-    max-width: 1200px;
-    margin-left: auto;
-    margin-right: auto;
+    min-height: 90px;
+    box-shadow: inset 0 0 10px rgb(0 0 0 / 0.05);
   }
 
-  /* Scrollbar عربة التسوق */
-  #cartItems::-webkit-scrollbar {
-    width: 8px;
+  /* Footer */
+  footer {
+    background-color: #232f3e;
+    color: white;
+    text-align: center;
+    padding: 15px 20px;
+    font-size: 14px;
   }
-  #cartItems::-webkit-scrollbar-thumb {
-    background-color: #bbb;
-    border-radius: 10px;
+  footer a {
+    color: #ffd814;
+    text-decoration: none;
+    font-weight: 700;
+  }
+  footer a:hover {
+    text-decoration: underline;
+  }
+
+  /* Scrollbar جميل للعربة */
+  #cartItems::-webkit-scrollbar {
+    width: 6px;
   }
   #cartItems::-webkit-scrollbar-track {
     background: #f1f1f1;
+  }
+  #cartItems::-webkit-scrollbar-thumb {
+    background: #4a90e2;
+    border-radius: 10px;
+  }
+
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .main-content {
+      flex-direction: column;
+    }
+    .sidebar {
+      width: 100%;
+      margin-bottom: 30px;
+    }
+    .cart {
+      width: 100%;
+    }
   }
 </style>
 </head>
 <body>
 
-<header>
-  <h1 id="title">My Store</h1>
-  <button id="langToggle">عربي</button>
-</header>
+<div class="container">
 
-<div id="productsContainer">
-  <!-- المنتجات تظهر هنا -->
-</div>
+  <header>
+    <h1 id="title">My Store</h1>
+    <button id="langToggle" aria-label="Toggle Language">عربي</button>
+  </header>
 
-<div class="cart">
-  <h2 id="cartTitle">Shopping Cart</h2>
-  <div id="cartItems">
-    <!-- عناصر السلة -->
-  </div>
-  <div class="total" id="cartTotal">Total: $0.00</div>
-
-  <div id="paymentOptions">
-    <label><input type="radio" name="paymentMethod" value="paypal" checked> PayPal / بطاقة ائتمان</label>
-    <label><input type="radio" name="paymentMethod" value="bank"> التحويل البنكي</label>
-    <label><input type="radio" name="paymentMethod" value="stcpay"> STC Pay</label>
+  <div id="searchBar">
+    <input type="text" id="searchInput" placeholder="Search products..." aria-label="Search products" />
+    <button id="searchBtn">Search</button>
   </div>
 
-  <button id="checkoutBtn">الدفع</button>
-  <div id="paymentMessage"></div>
+  <div class="main-content">
+
+    <aside class="sidebar" aria-label="Product Filters">
+      <h3 id="filtersTitle">Filters</h3>
+
+      <div class="filter-group">
+        <h4>Category</h4>
+        <label><input type="checkbox" name="category" value="electronics" /> Electronics</label>
+        <label><input type="checkbox" name="category" value="books" /> Books</label>
+        <label><input type="checkbox" name="category" value="fashion" /> Fashion</label>
+      </div>
+
+      <div class="filter-group">
+        <h4>Price</h4>
+        <label><input type="checkbox" name="price" value="0-50" /> $0 - $50</label>
+        <label><input type="checkbox" name="price" value="51-150" /> $51 - $150</label>
+        <label><input type="checkbox" name="price" value="151-500" /> $151 - $500</label>
+      </div>
+    </aside>
+
+    <section id="productsContainer" aria-live="polite" aria-label="Product List">
+      <!-- المنتجات تظهر هنا -->
+    </section>
+
+    <aside class="cart" aria-label="Shopping Cart">
+      <h2 id="cartTitle">Shopping Cart</h2>
+      <div id="cartItems" tabindex="0">
+        <!-- عناصر السلة -->
+      </div>
+      <div class="total" id="cartTotal">Total: $0.00</div>
+
+      <form id="paymentOptions" aria-label="Payment Options">
+        <label><input type="radio" name="paymentMethod" value="paypal" checked /> PayPal / Credit Card</label>
+        <label><input type="radio" name="paymentMethod" value="bank" /> Bank Transfer</label>
+        <label><input type="radio" name="paymentMethod" value="stcpay" /> STC Pay</label>
+      </form>
+
+      <button id="checkoutBtn">Checkout</button>
+
+      <div id="paymentMessage" aria-live="polite"></div>
+    </aside>
+
+  </div>
+
 </div>
+
+<footer>
+  &copy; 2025 My Store. Developed by You. 
+  <br />
+  <a href="#" target="_blank" rel="noopener noreferrer">Terms of Service</a> | <a href="#" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
+</footer>
 
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
@@ -268,7 +433,7 @@
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
 
-  let currentLang = 'en';
+  let currentLang = 'en'; // اللغة الافتراضية
 
   const productsContainer = document.getElementById('productsContainer');
   const langToggle = document.getElementById('langToggle');
@@ -278,8 +443,17 @@
   const cartTotal = document.getElementById('cartTotal');
   const checkoutBtn = document.getElementById('checkoutBtn');
   const paymentMessage = document.getElementById('paymentMessage');
+  const searchInput = document.getElementById('searchInput');
+  const searchBtn = document.getElementById('searchBtn');
+  const filtersTitle = document.getElementById('filtersTitle');
 
   let cart = [];
+
+  // تخزين فلاتر (يمكن تطويرها لاحقاً)
+  const filters = {
+    category: new Set(),
+    price: new Set()
+  };
 
   langToggle.addEventListener('click', () => {
     currentLang = currentLang === 'en' ? 'ar' : 'en';
@@ -289,17 +463,46 @@
       langToggle.textContent = 'English';
       cartTitle.textContent = 'عربة التسوق';
       checkoutBtn.textContent = 'الدفع';
+      searchInput.placeholder = 'ابحث عن المنتجات...';
+      searchBtn.textContent = 'بحث';
+      filtersTitle.textContent = 'التصنيفات';
       document.body.dir = 'rtl';
     } else {
       title.textContent = 'My Store';
       langToggle.textContent = 'عربي';
       cartTitle.textContent = 'Shopping Cart';
       checkoutBtn.textContent = 'Checkout';
+      searchInput.placeholder = 'Search products...';
+      searchBtn.textContent = 'Search';
+      filtersTitle.textContent = 'Filters';
       document.body.dir = 'ltr';
     }
+    paymentMessage.innerHTML = '';
     loadProducts();
     renderCart();
-    paymentMessage.innerHTML = '';
+  });
+
+  // تحديث الفلاتر عند تغييرهم
+  document.querySelectorAll('.sidebar input[type="checkbox"]').forEach(chk => {
+    chk.addEventListener('change', e => {
+      const input = e.target;
+      const groupName = input.name;
+      if(input.checked){
+        filters[groupName].add(input.value);
+      } else {
+        filters[groupName].delete(input.value);
+      }
+      loadProducts();
+    });
+  });
+
+  searchBtn.addEventListener('click', () => {
+    loadProducts();
+  });
+  searchInput.addEventListener('keyup', e => {
+    if(e.key === 'Enter'){
+      loadProducts();
+    }
   });
 
   function loadProducts(){
@@ -310,15 +513,52 @@
         productsContainer.textContent = currentLang === 'ar' ? 'لا توجد منتجات.' : 'No products found.';
         return;
       }
+      let products = [];
       snapshot.forEach(doc => {
-        const product = doc.data();
+        let p = doc.data();
+        p.id = doc.id;
+        products.push(p);
+      });
+
+      // تصفية حسب البحث
+      const searchTerm = searchInput.value.trim().toLowerCase();
+      if(searchTerm.length > 0){
+        products = products.filter(p => 
+          p.name.toLowerCase().includes(searchTerm) || 
+          p.description.toLowerCase().includes(searchTerm)
+        );
+      }
+
+      // تصفية حسب الفئات (إذا محدد)
+      if(filters.category.size > 0){
+        products = products.filter(p => filters.category.has(p.category));
+      }
+      // تصفية حسب السعر (إذا محدد)
+      if(filters.price.size > 0){
+        products = products.filter(p => {
+          for(let range of filters.price){
+            let [min,max] = range.split('-').map(Number);
+            if(p.price >= min && p.price <= max){
+              return true;
+            }
+          }
+          return false;
+        });
+      }
+
+      if(products.length === 0){
+        productsContainer.textContent = currentLang === 'ar' ? 'لا توجد منتجات مطابقة.' : 'No matching products.';
+        return;
+      }
+
+      products.forEach(product => {
         const productDiv = document.createElement('div');
         productDiv.className = 'product';
         productDiv.innerHTML = `
-          <h3>${product.name}</h3>
-          <p class="price">${currentLang === 'ar' ? 'السعر' : 'Price'}: $${product.price.toFixed(2)}</p>
-          <p class="description">${product.description}</p>
-          <button data-id="${doc.id}">${currentLang === 'ar' ? 'أضف إلى السلة' : 'Add to Cart'}</button>
+          <h3>${currentLang === 'ar' ? product.name_ar || product.name : product.name}</h3>
+          <p class="description">${currentLang === 'ar' ? product.description_ar || product.description : product.description}</p>
+          <p class="price">$${product.price.toFixed(2)}</p>
+          <button data-id="${product.id}">${currentLang === 'ar' ? 'أضف إلى السلة' : 'Add to Cart'}</button>
         `;
         productsContainer.appendChild(productDiv);
       });
@@ -326,141 +566,95 @@
       // إضافة حدث أزرار "أضف إلى السلة"
       document.querySelectorAll('.product button').forEach(btn => {
         btn.addEventListener('click', () => {
-          const productId = btn.getAttribute('data-id');
-          addToCart(productId);
+          const id = btn.getAttribute('data-id');
+          addToCart(id);
         });
       });
+    }).catch(err => {
+      productsContainer.innerHTML = `<p style="text-align:center; color:#b12704;">${currentLang === 'ar' ? 'خطأ في تحميل المنتجات.' : 'Error loading products.'}</p>`;
+      console.error(err);
     });
   }
 
+  // إضافة منتج إلى العربة
   function addToCart(productId){
     db.collection('products').doc(productId).get().then(doc => {
       if(!doc.exists) return;
-      const product = doc.data();
-      // تحقق إذا المنتج موجود في السلة
-      const existing = cart.find(item => item.id === productId);
-      if(existing){
-        existing.qty++;
+      const prod = doc.data();
+      const found = cart.find(item => item.id === productId);
+      if(found){
+        found.qty++;
       } else {
-        cart.push({...product, id: productId, qty: 1});
+        cart.push({
+          id: productId,
+          name: currentLang === 'ar' ? prod.name_ar || prod.name : prod.name,
+          price: prod.price,
+          qty: 1
+        });
       }
-      saveCart();
       renderCart();
     });
   }
 
+  // عرض محتويات العربة
   function renderCart(){
     cartItems.innerHTML = '';
     if(cart.length === 0){
-      cartItems.innerHTML = `<p style="text-align:center; color:#777;">${currentLang === 'ar' ? 'السلة فارغة' : 'Cart is empty'}</p>`;
-      cartTotal.textContent = currentLang === 'ar' ? 'الإجمالي: $0.00' : 'Total: $0.00';
+      cartItems.textContent = currentLang === 'ar' ? 'السلة فارغة' : 'Your cart is empty.';
+      cartTotal.textContent = currentLang === 'ar' ? 'المجموع: $0.00' : 'Total: $0.00';
       return;
     }
     let total = 0;
     cart.forEach(item => {
       total += item.price * item.qty;
-      const cartItem = document.createElement('div');
-      cartItem.className = 'cart-item';
-      cartItem.innerHTML = `
-        <div>${item.name} x ${item.qty}</div>
+      const div = document.createElement('div');
+      div.className = 'cart-item';
+      div.innerHTML = `
+        <div>${item.name} (${item.qty})</div>
         <div>$${(item.price * item.qty).toFixed(2)}</div>
-        <button data-id="${item.id}">&times;</button>
+        <button aria-label="${currentLang === 'ar' ? 'إزالة ' + item.name : 'Remove ' + item.name}">×</button>
       `;
-      cartItems.appendChild(cartItem);
-
-      // حذف المنتج من السلة
-      cartItem.querySelector('button').addEventListener('click', () => {
+      div.querySelector('button').addEventListener('click', () => {
         removeFromCart(item.id);
       });
+      cartItems.appendChild(div);
     });
-    cartTotal.textContent = (currentLang === 'ar' ? 'الإجمالي: ' : 'Total: ') + '$' + total.toFixed(2);
+    cartTotal.textContent = (currentLang === 'ar' ? 'المجموع: ' : 'Total: ') + '$' + total.toFixed(2);
   }
 
+  // إزالة منتج من العربة
   function removeFromCart(productId){
     cart = cart.filter(item => item.id !== productId);
-    saveCart();
     renderCart();
   }
 
-  function saveCart(){
-    localStorage.setItem('myStoreCart', JSON.stringify(cart));
-  }
-
-  function loadCart(){
-    const saved = localStorage.getItem('myStoreCart');
-    if(saved){
-      cart = JSON.parse(saved);
-    }
-  }
-
+  // زر الدفع
   checkoutBtn.addEventListener('click', () => {
     if(cart.length === 0){
-      alert(currentLang === 'ar' ? 'السلة فارغة!' : 'Cart is empty!');
+      paymentMessage.textContent = currentLang === 'ar' ? 'عربة التسوق فارغة.' : 'Cart is empty.';
       return;
     }
-    const selectedMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
-
-    if(selectedMethod === 'paypal'){
-      paymentMessage.innerHTML = currentLang === 'ar' ? 
-        `<h4>الدفع عبر PayPal / بطاقة ائتمان</h4>
-        <p>سيتم توجيهك إلى PayPal لإتمام الدفع.</p>` : 
-        `<h4>PayPal / Credit Card Payment</h4>
-        <p>You will be redirected to PayPal to complete your payment.</p>`;
-      
-      cart = [];
-      saveCart();
-      renderCart();
-
-    } else if(selectedMethod === 'bank'){
-      paymentMessage.innerHTML = currentLang === 'ar' ?
-        `<h4>التحويل البنكي</h4>
-        <p>يرجى تحويل المبلغ إلى الحساب التالي:</p>
-        <ul>
-          <li>اسم البنك: بنككم</li>
-          <li>رقم الحساب: 1234567890</li>
-          <li>اسم الحساب: اسمك الكامل</li>
-        </ul>
-        <p>يرجى إرسال صورة الإيصال إلى البريد: your-email@example.com لتأكيد الطلب.</p>` 
-        : 
-        `<h4>Bank Transfer</h4>
-        <p>Please transfer the amount to the following account:</p>
-        <ul>
-          <li>Bank Name: Your Bank</li>
-          <li>Account Number: 1234567890</li>
-          <li>Account Name: Your Full Name</li>
-        </ul>
-        <p>Please send the receipt image to: your-email@example.com to confirm the order.</p>`;
-
-      cart = [];
-      saveCart();
-      renderCart();
-
-    } else if(selectedMethod === 'stcpay'){
-      paymentMessage.innerHTML = currentLang === 'ar' ?
-        `<h4>دفع عبر STC Pay</h4>
-        <p>يرجى إرسال المبلغ إلى رقم STC Pay التالي:</p>
-        <ul>
-          <li>رقم الجوال: 05XXXXXXXX</li>
-        </ul>
-        <p>يرجى إرسال صورة الإيصال إلى البريد: your-email@example.com لتأكيد الطلب.</p>`
-        :
-        `<h4>Pay via STC Pay</h4>
-        <p>Please send the amount to the following STC Pay number:</p>
-        <ul>
-          <li>Mobile Number: 05XXXXXXXX</li>
-        </ul>
-        <p>Please send the receipt image to: your-email@example.com to confirm the order.</p>`;
-
-      cart = [];
-      saveCart();
-      renderCart();
+    const method = document.querySelector('input[name="paymentMethod"]:checked').value;
+    let msg = '';
+    if(currentLang === 'ar'){
+      if(method === 'paypal') msg = 'سيتم توجيهك للدفع عبر PayPal أو بطاقة الائتمان.';
+      else if(method === 'bank') msg = 'يرجى تحويل المبلغ إلى حسابنا البنكي.';
+      else if(method === 'stcpay') msg = 'يرجى الدفع عبر STC Pay باستخدام رقم الهاتف المسجل.';
+    } else {
+      if(method === 'paypal') msg = 'You will be redirected to PayPal / Credit Card payment.';
+      else if(method === 'bank') msg = 'Please transfer the amount to our bank account.';
+      else if(method === 'stcpay') msg = 'Please pay via STC Pay using your registered phone number.';
     }
+    paymentMessage.textContent = msg;
+
+    // هنا يمكن إضافة منطق فعلي للدفع أو الربط مع API الدفع
+    // حاليا فقط رسالة توضيحية
   });
 
-  // تحميل السلة من التخزين المحلي وتحميل المنتجات عند بدء الصفحة
-  loadCart();
+  // تحميل المنتجات أول مرة
   loadProducts();
   renderCart();
+
 </script>
 
 </body>
