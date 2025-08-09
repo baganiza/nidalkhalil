@@ -3,71 +3,90 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>My E-commerce Store</title>
+<title>My Store</title>
 <style>
-  body { font-family: Arial, sans-serif; padding: 20px; }
-  .product { border: 1px solid #ccc; padding: 15px; margin-bottom: 10px; }
-  .product h2 { margin-top: 0; }
+  body { font-family: Arial, sans-serif; padding: 20px; max-width: 900px; margin: auto; }
+  header { display: flex; justify-content: space-between; align-items: center; }
+  button { padding: 8px 12px; cursor: pointer; }
+  h1 { margin-bottom: 20px; }
+  .product { border: 1px solid #ccc; padding: 15px; margin-bottom: 15px; border-radius: 5px; }
+  .product h3 { margin: 0 0 10px; }
+  .product p { margin: 5px 0; }
 </style>
 </head>
 <body>
 
-<h1>Welcome to My Store</h1>
-<div id="products-list"></div>
+<header>
+  <h1 id="title">My Store</h1>
+  <button id="langToggle">عربي</button>
+</header>
+
+<div id="productsContainer">
+  <!-- المنتجات تظهر هنا -->
+</div>
 
 <!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
 <script>
-  // نفس إعدادات Firebase الخاصة بك هنا
   const firebaseConfig = {
-    const firebaseConfig = {
-  apiKey: "AIzaSyCcWgFDzs95TbVU7v5h_5O0lNzZvBlL90o",
-  authDomain: "baganiza-66bf0.firebaseapp.com",
-  projectId: "baganiza-66bf0",
-  storageBucket: "baganiza-66bf0.firebasestorage.app",
-  messagingSenderId: "1016966032123",
-  appId: "1:1016966032123:web:fbffd397c7d8494fa79e5e"
-};
+    apiKey: "AIzaSyCcWgFDzs95TbVU7v5h_5O0lNzZvBlL90o",
+    authDomain: "baganiza-66bf0.firebaseapp.com",
+    projectId: "baganiza-66bf0",
+    storageBucket: "baganiza-66bf0.firebasestorage.app",
+    messagingSenderId: "1016966032123",
+    appId: "1:1016966032123:web:fbffd397c7d8494fa79e5e"
   };
 
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
 
-  const productsList = document.getElementById('products-list');
+  let currentLang = 'en'; // اللغة الافتراضية
 
-  function escapeHtml(text) {
-    return text.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/'/g, "&#39;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-  }
+  const productsContainer = document.getElementById('productsContainer');
+  const langToggle = document.getElementById('langToggle');
+  const title = document.getElementById('title');
 
-  function loadProducts() {
-    productsList.innerHTML = "<p>Loading products...</p>";
-    db.collection("products").orderBy("name").get()
-      .then(snapshot => {
-        productsList.innerHTML = "";
-        snapshot.forEach(doc => {
-          const p = doc.data();
-          const productHTML = `
-            <div class="product">
-              <h2>${escapeHtml(p.name)}</h2>
-              <p>Price: $${p.price.toFixed(2)}</p>
-              <p>${escapeHtml(p.description)}</p>
-            </div>
-          `;
-          productsList.insertAdjacentHTML('beforeend', productHTML);
-        });
-        if (snapshot.empty) {
-          productsList.innerHTML = "<p>No products found.</p>";
-        }
-      })
-      .catch(e => {
-        productsList.innerHTML = "<p>Failed to load products.</p>";
-        console.error(e);
+  langToggle.addEventListener('click', () => {
+    currentLang = currentLang === 'en' ? 'ar' : 'en';
+    if(currentLang === 'ar'){
+      title.textContent = 'متجري';
+      langToggle.textContent = 'English';
+      document.body.dir = 'rtl';
+    } else {
+      title.textContent = 'My Store';
+      langToggle.textContent = 'عربي';
+      document.body.dir = 'ltr';
+    }
+    loadProducts();
+  });
+
+  function loadProducts(){
+    productsContainer.innerHTML = 'Loading products...';
+    db.collection('products').get().then(snapshot => {
+      productsContainer.innerHTML = '';
+      if(snapshot.empty){
+        productsContainer.textContent = currentLang === 'ar' ? 'لا توجد منتجات.' : 'No products found.';
+        return;
+      }
+      snapshot.forEach(doc => {
+        const product = doc.data();
+        const productDiv = document.createElement('div');
+        productDiv.className = 'product';
+        productDiv.innerHTML = `
+          <h3>${product.name}</h3>
+          <p><strong>${currentLang === 'ar' ? 'السعر' : 'Price'}:</strong> $${product.price}</p>
+          <p>${product.description}</p>
+        `;
+        productsContainer.appendChild(productDiv);
       });
+    });
   }
 
+  // تحميل المنتجات أول مرة
   loadProducts();
 </script>
+
 </body>
 </html>
