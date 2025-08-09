@@ -1,213 +1,237 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Admin Panel - Manage Products</title>
-<style>
-  body { font-family: Arial, sans-serif; padding: 20px; }
-  table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
-  th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-  button { padding: 5px 10px; margin: 2px; }
-  #login-form, #logout-btn { margin-bottom: 20px; }
-  #product-form { margin-top: 20px; }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin Panel - Manage Products</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    #login-form, #admin-panel { max-width: 600px; margin: auto; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background-color: #f4f4f4; }
+    button { padding: 6px 12px; margin: 2px; }
+    input, textarea { width: 100%; padding: 6px; margin: 4px 0; box-sizing: border-box; }
+  </style>
 </head>
 <body>
 
-<h1>Admin Panel - Manage Products</h1>
+  <!-- نموذج تسجيل الدخول -->
+  <div id="login-form">
+    <h2>Admin Login</h2>
+    <input type="email" id="email" placeholder="Email" required />
+    <input type="password" id="password" placeholder="Password" required />
+    <button id="login-btn">Login</button>
+    <p id="login-error" style="color:red;"></p>
+  </div>
 
-<!-- Login Form -->
-<div id="login-form">
-  <h3>Login</h3>
-  <input type="email" id="email" placeholder="Email" /><br /><br />
-  <input type="password" id="password" placeholder="Password" /><br /><br />
-  <button id="login-btn">Login</button>
-  <p id="login-msg" style="color:red;"></p>
-</div>
+  <!-- لوحة الادمن (تظهر بعد تسجيل الدخول) -->
+  <div id="admin-panel" style="display:none;">
+    <h2>Admin Panel - Manage Products</h2>
+    <button id="logout-btn">Logout</button>
 
-<!-- Logout Button -->
-<div id="logout-btn" style="display:none;">
-  <button id="logout">Logout</button>
-</div>
+    <h3>Current Products</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th><th>Name</th><th>Price</th><th>Description</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="products-table-body"></tbody>
+    </table>
 
-<!-- Products Table -->
-<div id="admin-content" style="display:none;">
-  <h3>Current Products</h3>
-  <table>
-    <thead>
-      <tr><th>ID</th><th>Name</th><th>Price</th><th>Description</th><th>Actions</th></tr>
-    </thead>
-    <tbody id="products-table"></tbody>
-  </table>
-
-  <h3>Add / Edit Product</h3>
-  <form id="product-form">
+    <h3>Add / Edit Product</h3>
     <input type="hidden" id="product-id" />
-    <input type="text" id="product-name" placeholder="Name" required />
-    <input type="number" id="product-price" placeholder="Price" required min="0" />
-    <input type="text" id="product-desc" placeholder="Description" required />
-    <button type="submit">Save Product</button>
-    <button type="button" id="cancel-edit" style="display:none;">Cancel Edit</button>
-  </form>
-</div>
+    <label>Name:</label>
+    <input type="text" id="product-name" />
+    <label>Price:</label>
+    <input type="number" id="product-price" />
+    <label>Description:</label>
+    <textarea id="product-description"></textarea>
+    <button id="save-product-btn">Save Product</button>
+  </div>
 
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js"></script>
 
-<script>
-  // TODO: استبدل البيانات هنا ببيانات مشروع Firebase الخاص بك
-  const firebaseConfig = {
+  <script>
+    // TODO: عوّض القيم هذه بإعدادات مشروع Firebase الخاص بك
     const firebaseConfig = {
-  apiKey: "AIzaSyCcWgFDzs95TbVU7v5h_5O0lNzZvBlL90o",
-  authDomain: "baganiza-66bf0.firebaseapp.com",
-  projectId: "baganiza-66bf0",
-  storageBucket: "baganiza-66bf0.firebasestorage.app",
-  messagingSenderId: "1016966032123",
-  appId: "1:1016966032123:web:fbffd397c7d8494fa79e5e"
-};
-  };
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
 
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.firestore();
+    // تهيئة Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
 
-  const loginForm = document.getElementById('login-form');
-  const loginBtn = document.getElementById('login-btn');
-  const loginMsg = document.getElementById('login-msg');
-  const logoutBtn = document.getElementById('logout-btn');
-  const logout = document.getElementById('logout');
-  const adminContent = document.getElementById('admin-content');
+    // عناصر الصفحة
+    const loginForm = document.getElementById('login-form');
+    const adminPanel = document.getElementById('admin-panel');
+    const loginBtn = document.getElementById('login-btn');
+    const logoutBtn = document.getElementById('logout-btn');
+    const loginError = document.getElementById('login-error');
 
-  const productsTable = document.getElementById('products-table');
-  const productForm = document.getElementById('product-form');
-  const productIdInput = document.getElementById('product-id');
-  const productNameInput = document.getElementById('product-name');
-  const productPriceInput = document.getElementById('product-price');
-  const productDescInput = document.getElementById('product-desc');
-  const cancelEditBtn = document.getElementById('cancel-edit');
+    const productsTableBody = document.getElementById('products-table-body');
+    const saveProductBtn = document.getElementById('save-product-btn');
 
-  // تابع تحديث عرض المنتجات من Firestore
-  function loadProducts() {
-    productsTable.innerHTML = "";
-    db.collection("products").orderBy("name").get()
-      .then(snapshot => {
-        snapshot.forEach(doc => {
-          const p = doc.data();
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td>${doc.id}</td>
-            <td>${p.name}</td>
-            <td>${p.price}</td>
-            <td>${p.description}</td>
-            <td>
-              <button onclick="editProduct('${doc.id}', '${escapeHtml(p.name)}', ${p.price}, '${escapeHtml(p.description)}')">Edit</button>
-              <button onclick="deleteProduct('${doc.id}')">Delete</button>
-            </td>
-          `;
-          productsTable.appendChild(row);
+    const productIdInput = document.getElementById('product-id');
+    const productNameInput = document.getElementById('product-name');
+    const productPriceInput = document.getElementById('product-price');
+    const productDescriptionInput = document.getElementById('product-description');
+
+    // تسجيل الدخول
+    loginBtn.addEventListener('click', () => {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      loginError.textContent = '';
+
+      auth.signInWithEmailAndPassword(email, password)
+        .then(() => {
+          loginForm.style.display = 'none';
+          adminPanel.style.display = 'block';
+          loadProducts();
+        })
+        .catch(error => {
+          loginError.textContent = error.message;
         });
-      })
-      .catch(e => console.error("Error loading products:", e));
-  }
+    });
 
-  // دالة لحماية النصوص (لتجنب مشاكل في HTML)
-  function escapeHtml(text) {
-    return text.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/'/g, "&#39;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-  }
+    // تسجيل الخروج
+    logoutBtn.addEventListener('click', () => {
+      auth.signOut().then(() => {
+        adminPanel.style.display = 'none';
+        loginForm.style.display = 'block';
+        clearForm();
+        productsTableBody.innerHTML = '';
+      });
+    });
 
-  // تفعيل زر التعديل
-  function editProduct(id, name, price, description) {
-    productIdInput.value = id;
-    productNameInput.value = name;
-    productPriceInput.value = price;
-    productDescInput.value = description;
-    cancelEditBtn.style.display = "inline";
-  }
-
-  // حذف المنتج
-  function deleteProduct(id) {
-    if (confirm("Are you sure to delete this product?")) {
-      db.collection("products").doc(id).delete()
-      .then(() => loadProducts())
-      .catch(e => alert("Failed to delete: " + e));
-    }
-  }
-
-  // إلغاء التعديل
-  cancelEditBtn.addEventListener('click', () => {
-    productIdInput.value = "";
-    productForm.reset();
-    cancelEditBtn.style.display = "none";
-  });
-
-  // حفظ المنتج (إضافة أو تحديث)
-  productForm.addEventListener('submit', e => {
-    e.preventDefault();
-    const id = productIdInput.value.trim();
-    const name = productNameInput.value.trim();
-    const price = parseFloat(productPriceInput.value);
-    const description = productDescInput.value.trim();
-
-    if (!name || isNaN(price) || !description) {
-      alert("Please fill all fields correctly.");
-      return;
-    }
-
-    if (id) {
-      // تحديث
-      db.collection("products").doc(id).set({ name, price, description })
-      .then(() => {
+    // مراقبة حالة الدخول
+    auth.onAuthStateChanged(user => {
+      if(user) {
+        loginForm.style.display = 'none';
+        adminPanel.style.display = 'block';
         loadProducts();
-        productForm.reset();
-        productIdInput.value = "";
-        cancelEditBtn.style.display = "none";
-      })
-      .catch(e => alert("Update failed: " + e));
-    } else {
-      // إضافة جديد (مع Auto-ID)
-      db.collection("products").add({ name, price, description })
-      .then(() => {
-        loadProducts();
-        productForm.reset();
-      })
-      .catch(e => alert("Add failed: " + e));
-    }
-  });
+      } else {
+        adminPanel.style.display = 'none';
+        loginForm.style.display = 'block';
+        clearForm();
+        productsTableBody.innerHTML = '';
+      }
+    });
 
-  // تسجيل الدخول
-  loginBtn.addEventListener('click', () => {
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value.trim();
-    loginMsg.textContent = "";
-    if (!email || !password) {
-      loginMsg.textContent = "Please enter email and password";
-      return;
-    }
-    auth.signInWithEmailAndPassword(email, password)
-      .catch(err => loginMsg.textContent = err.message);
-  });
+    // تحميل المنتجات من Firestore
+    function loadProducts() {
+      productsTableBody.innerHTML = 'Loading...';
+      db.collection('products').orderBy('id').get()
+        .then(snapshot => {
+          productsTableBody.innerHTML = '';
+          snapshot.forEach(doc => {
+            const product = doc.data();
+            const tr = document.createElement('tr');
 
-  // تسجيل الخروج
-  logout.addEventListener('click', () => {
-    auth.signOut();
-  });
-
-  // حالة المستخدم (مراقبة تسجيل الدخول)
-  auth.onAuthStateChanged(user => {
-    if (user) {
-      loginForm.style.display = "none";
-      logoutBtn.style.display = "block";
-      adminContent.style.display = "block";
-      loadProducts();
-    } else {
-      loginForm.style.display = "block";
-      logoutBtn.style.display = "none";
-      adminContent.style.display = "none";
+            tr.innerHTML = `
+              <td>${product.id}</td>
+              <td>${product.name}</td>
+              <td>${product.price}</td>
+              <td>${product.description}</td>
+              <td>
+                <button onclick="editProduct('${doc.id}')">Edit</button>
+                <button onclick="deleteProduct('${doc.id}')">Delete</button>
+              </td>
+            `;
+            productsTableBody.appendChild(tr);
+          });
+        })
+        .catch(error => {
+          productsTableBody.innerHTML = 'Error loading products: ' + error.message;
+        });
     }
-  });
-</script>
+
+    // حفظ (إضافة/تعديل) منتج
+    saveProductBtn.addEventListener('click', () => {
+      const id = productIdInput.value;
+      const name = productNameInput.value.trim();
+      const price = parseFloat(productPriceInput.value);
+      const description = productDescriptionInput.value.trim();
+
+      if (!name || isNaN(price) || !description) {
+        alert('Please fill all fields correctly.');
+        return;
+      }
+
+      if(id) {
+        // تعديل المنتج
+        db.collection('products').doc(id).update({
+          name, price, description
+        }).then(() => {
+          alert('Product updated.');
+          clearForm();
+          loadProducts();
+        }).catch(err => alert('Error updating product: ' + err.message));
+      } else {
+        // إضافة منتج جديد برقم ID جديد (أكبر رقم موجود + 1)
+        db.collection('products').orderBy('id', 'desc').limit(1).get()
+          .then(snapshot => {
+            let newId = 1;
+            if (!snapshot.empty) {
+              newId = snapshot.docs[0].data().id + 1;
+            }
+            db.collection('products').add({
+              id: newId,
+              name,
+              price,
+              description
+            }).then(() => {
+              alert('Product added.');
+              clearForm();
+              loadProducts();
+            }).catch(err => alert('Error adding product: ' + err.message));
+          });
+      }
+    });
+
+    // تعديل المنتج (يعرض بياناته في النموذج)
+    function editProduct(docId) {
+      db.collection('products').doc(docId).get()
+        .then(doc => {
+          if(doc.exists) {
+            const product = doc.data();
+            productIdInput.value = doc.id;
+            productNameInput.value = product.name;
+            productPriceInput.value = product.price;
+            productDescriptionInput.value = product.description;
+          }
+        });
+    }
+
+    // حذف المنتج
+    function deleteProduct(docId) {
+      if(confirm('Are you sure you want to delete this product?')) {
+        db.collection('products').doc(docId).delete()
+          .then(() => {
+            alert('Product deleted.');
+            loadProducts();
+          }).catch(err => alert('Error deleting product: ' + err.message));
+      }
+    }
+
+    // تفريغ نموذج الادخال
+    function clearForm() {
+      productIdInput.value = '';
+      productNameInput.value = '';
+      productPriceInput.value = '';
+      productDescriptionInput.value = '';
+    }
+
+  </script>
 </body>
 </html>
