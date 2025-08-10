@@ -1,272 +1,562 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
+<meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>BAGANIZA Store</title>
-<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+
 <style>
-  body {
-    font-family: 'Roboto', sans-serif;
-    margin: 0; padding: 0;
-    background: linear-gradient(to bottom right, #f0f4ff, #dbeafe);
+  :root{
+    --brand:#1f6feb;
+    --accent:#ffb457;
+    --bg1:#f3f7fb;
+    --bg2:#e6f0ff;
+    --card:#ffffff;
+    --muted:#6b7280;
   }
-  header {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 15px; background: linear-gradient(to right, #1e3a8a, #2563eb);
-    color: white; flex-wrap: wrap;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  *{box-sizing:border-box}
+  body{
+    margin:0; font-family: 'Inter', Arial, sans-serif;
+    background: linear-gradient(180deg,var(--bg1) 0%, #eef6ff 50%, #e6f0ff 100%);
+    color:#0f172a;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
   }
-  h1 {
-    margin: 0; font-size: 28px; font-family: 'Great Vibes', cursive;
+
+  /* Header */
+  header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding:14px 18px;
+    background:linear-gradient(90deg, #0b3459 0%, var(--brand) 100%);
+    color:white;
+    position:sticky;
+    top:0;
+    z-index:20;
+    box-shadow: 0 3px 10px rgba(12, 45, 75, 0.2);
   }
-  button, select, input {
-    padding: 6px; margin: 5px;
-    border-radius: 5px; border: 1px solid #ccc;
+  header .brand{
+    display:flex;
+    align-items:center;
+    gap:12px;
   }
-  button {
-    background: #2563eb; color: white; border: none;
-    cursor: pointer; transition: background 0.3s;
+  h1.brand-title{
+    margin:0; font-family:'Playfair Display', serif;
+    font-size:22px; letter-spacing:0.6px;
   }
-  button:hover { background: #1d4ed8; }
-  #productsContainer {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 15px; padding: 15px;
+  .header-controls{
+    display:flex; gap:10px; align-items:center;
   }
-  .product {
-    background: white; border-radius: 8px;
-    padding: 10px; text-align: center;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    transition: transform 0.2s, box-shadow 0.2s;
+  .search-input{
+    padding:8px 10px;
+    border-radius:8px;
+    border: none;
+    min-width:220px;
+    outline:none;
   }
-  .product:hover {
-    transform: scale(1.03);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  .select-filter{
+    padding:8px 10px; border-radius:8px; border:none; background:white;
   }
-  .product img {
-    max-width: 100%; height: 150px; object-fit: cover;
-    border-radius: 5px;
+  .btn{
+    background:var(--accent);
+    border:none; padding:8px 12px; border-radius:8px;
+    cursor:pointer; font-weight:600;
   }
-  .product h3 { font-size: 16px; margin: 10px 0; }
-  .cart-icon { position: relative; cursor: pointer; font-size: 20px; }
-  .cart-count {
-    position: absolute; top: -5px; right: -10px;
-    background: yellow; color: black; font-size: 12px;
-    padding: 2px 6px; border-radius: 50%;
+  .lang-btn{
+    background:transparent; color:white; border:1px solid rgba(255,255,255,0.12);
+    padding:6px 10px; border-radius:8px;
   }
-  #cartSidebar {
-    position: fixed; right: 0; top: 0;
-    width: 300px; height: 100%;
-    background: white;
-    box-shadow: -2px 0 5px rgba(0,0,0,0.2);
-    transform: translateX(100%);
-    transition: transform 0.3s;
-    padding: 15px; overflow-y: auto;
+  .cart-icon{
+    position:relative; cursor:pointer; font-size:18px;
+    background:rgba(255,255,255,0.06); padding:6px 8px; border-radius:8px;
   }
-  #cartSidebar.open { transform: translateX(0); }
-  #cartTotal { font-size: 18px; font-weight: bold; color: red; }
-  /* Modal Styles */
-  .modal {
-    display: none; position: fixed; z-index: 1000;
-    left: 0; top: 0; width: 100%; height: 100%;
-    background-color: rgba(0,0,0,0.5);
+  .cart-count{
+    position:absolute; top:-6px; right:-6px; background:gold; color:#000;
+    border-radius:50%; padding:2px 6px; font-size:12px; font-weight:700;
+    box-shadow:0 1px 2px rgba(0,0,0,0.2);
   }
-  .modal-content {
-    background: white; margin: 10% auto; padding: 20px;
-    border-radius: 8px; width: 90%; max-width: 400px;
+
+  /* Products grid - force 3 columns everywhere */
+  main{
+    padding:18px;
+    max-width:1200px;
+    margin:0 auto;
   }
-  footer {
-    text-align: center; padding: 10px;
-    background: linear-gradient(to right, #1e3a8a, #2563eb);
-    color: white; font-size: 14px;
+  #productsContainer{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 columns always */
+    gap:14px;
+    align-items:start;
+  }
+  .product{
+    background:var(--card);
+    border-radius:12px;
+    padding:10px;
+    box-shadow: 0 6px 18px rgba(28,45,78,0.06);
+    transition: transform .18s ease, box-shadow .18s ease;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    min-height:150px;
+  }
+  .product:hover{
+    transform: translateY(-6px);
+    box-shadow: 0 12px 30px rgba(28,45,78,0.12);
+  }
+  .product img{
+    width:100%; height:120px; object-fit:cover; border-radius:8px;
+    background:#f5f7fb;
+  }
+  .product h3{ margin:8px 0 6px 0; font-size:15px; color:#0b3d91; }
+  .product .price{ font-weight:700; color:var(--brand); margin-bottom:6px; }
+  .product .desc{ color:var(--muted); font-size:13px; min-height:36px; }
+  .product .controls{ display:flex; gap:8px; align-items:center; justify-content:space-between; margin-top:10px; }
+  .add-small{ padding:6px 8px; font-size:12px; border-radius:8px; border:none; cursor:pointer; background:var(--brand); color:white; }
+  .qty-bubble{ font-size:13px; color:var(--muted); background:#f3f5f8; padding:6px 8px; border-radius:999px; }
+
+  /* Cart sidebar */
+  #cartSidebar{
+    position:fixed; right:18px; top:84px; width:320px; max-height:76vh; overflow:auto;
+    background:linear-gradient(180deg,#ffffff,#fbfdff); padding:12px; border-radius:12px;
+    box-shadow: 0 18px 40px rgba(12,24,48,0.12); z-index:30; transform: translateY(10px);
+  }
+  #cartSidebar h2{ margin:0 0 8px 0; color:var(--brand) }
+  .cart-list{ list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:10px; }
+  .cart-item{ display:flex; justify-content:space-between; gap:8px; align-items:center; background:#fbfdff; padding:8px; border-radius:8px; border:1px solid #f1f5f9; }
+  .cart-item .left{ display:flex; gap:8px; align-items:center; }
+  .cart-item .title{ font-weight:600; font-size:13px; }
+  .cart-controls{ display:flex; gap:6px; align-items:center; }
+  .icon-btn{ background:#eef2ff; border:none; padding:6px 8px; border-radius:8px; cursor:pointer; }
+
+  #cartTotal{ margin-top:10px; font-weight:700; color:red; text-align:center; background:#fff0f0; padding:8px; border-radius:8px; }
+
+  /* Checkout modal */
+  .modal{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(2,6,23,0.45); z-index:60; padding:18px; }
+  .modal-box{ width:100%; max-width:760px; background:white; border-radius:12px; padding:18px; box-shadow:0 10px 30px rgba(2,6,23,0.25); max-height:90vh; overflow:auto; }
+  .pm-list{ display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+  .pm-item{ padding:8px 12px; border-radius:8px; border:1px solid #eef2ff; cursor:pointer; background:#fafcff; }
+  .pm-item.active{ border-color:var(--brand); box-shadow: 0 6px 18px rgba(31,111,235,0.08); }
+
+  /* Footer */
+  footer{ text-align:center; padding:14px 8px; color:white; background:linear-gradient(90deg,#0b3459,#1f6feb); margin-top:22px; font-size:14px; }
+
+  /* Responsive tweaks - on very small screens shrink fonts and paddings but still keep 3 columns */
+  @media (max-width:420px){
+    header{ padding:10px; }
+    .search-input{ min-width:120px; }
+    #productsContainer{ gap:10px; }
+    .product img{ height:90px; }
+    .product{ padding:8px; min-height:120px; }
+    .product h3{ font-size:14px }
+    .product .desc{ font-size:12px }
+    .add-small{ padding:5px 6px; font-size:11px; }
+    #cartSidebar{ width:280px; right:8px; top:72px; }
   }
 </style>
 </head>
 <body>
 
 <header>
-  <h1>BAGANIZA Store</h1>
-  <div>
-    <input type="text" id="searchInput" placeholder="Search products...">
-    <select id="categoryFilter"><option value="">All Categories</option></select>
-    <button id="langToggle">عربي</button>
-    <span class="cart-icon" id="cartIcon">🛒<span class="cart-count" id="cartCount">0</span></span>
+  <div class="brand">
+    <h1 class="brand-title">BAGANIZA Store</h1>
+  </div>
+
+  <div class="header-controls" role="search">
+    <input id="searchInput" class="search-input" placeholder="Search products..." aria-label="Search products" />
+    <select id="categoryFilter" class="select-filter" aria-label="Filter by category">
+      <option value="">All Categories</option>
+    </select>
+    <button id="langToggle" class="lang-btn" aria-pressed="false">عربي</button>
+    <div id="cartIcon" class="cart-icon" title="Open cart" aria-label="Open cart">
+      🛒 <span id="cartCount" class="cart-count">0</span>
+    </div>
   </div>
 </header>
 
-<div id="productsContainer"></div>
+<main>
+  <section id="productsContainer" aria-live="polite" aria-label="Product listings">
+    <!-- Products loaded from Firebase -->
+  </section>
+</main>
 
-<div id="cartSidebar">
+<!-- Cart Sidebar (keeps visible) -->
+<aside id="cartSidebar" aria-label="Shopping Cart">
   <h2>Shopping Cart</h2>
-  <ul id="cartItems"></ul>
-  <p id="cartTotal">Total: $0.00</p>
-  <button id="checkoutBtn">Checkout</button>
-</div>
+  <ul id="cartList" class="cart-list">
+    <li style="color:var(--muted)">Cart is empty</li>
+  </ul>
+
+  <div id="cartTotal">Total: $0.00</div>
+
+  <div style="display:flex; gap:8px; margin-top:12px;">
+    <button id="clearCartBtn" class="btn" style="background:#f97316;">Clear</button>
+    <button id="checkoutBtn" class="btn">Checkout</button>
+  </div>
+</aside>
 
 <!-- Checkout Modal -->
-<div id="checkoutModal" class="modal">
-  <div class="modal-content">
-    <h3>Choose Payment Method</h3>
-    <select id="paymentMethod">
-      <option value="">-- Select --</option>
-      <option value="cash">Cash</option>
-      <option value="bank">Bank Transfer</option>
-      <option value="stcpay">STC Pay</option>
-      <option value="paypal">PayPal</option>
-      <option value="card">Credit Card</option>
-    </select>
-    <div id="paymentDetails"></div>
-    <button id="confirmPaymentBtn">Confirm</button>
+<div id="checkoutModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="modal-box">
+    <h2>Checkout — Payment</h2>
+
+    <div>
+      <strong>Order Summary</strong>
+      <div id="orderSummary" style="margin-top:8px; font-size:14px; color:#0f172a;"></div>
+    </div>
+
+    <div style="margin-top:12px">
+      <strong>Choose payment method</strong>
+      <div class="pm-list" id="pmList">
+        <div class="pm-item active" data-method="cash">Cash on Delivery</div>
+        <div class="pm-item" data-method="bank">Bank Transfer</div>
+        <div class="pm-item" data-method="stcpay">STC Pay</div>
+        <div class="pm-item" data-method="paypal">PayPal</div>
+        <div class="pm-item" data-method="card">Credit Card</div>
+      </div>
+
+      <div id="pmDetails" style="margin-top:12px"></div>
+    </div>
+
+    <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:16px;">
+      <button id="cancelCheckout" class="btn" style="background:#94a3b8">Cancel</button>
+      <button id="confirmCheckout" class="btn" style="background:var(--brand); color:white">Confirm & Pay</button>
+    </div>
   </div>
 </div>
-
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-
-<script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyCcWgFDzs95TbVU7v5h_5O0lNzZvBlL90o",
-    authDomain: "baganiza-66bf0.firebaseapp.com",
-    projectId: "baganiza-66bf0",
-    storageBucket: "baganiza-66bf0.firebasestorage.app",
-    messagingSenderId: "1016966032123",
-    appId: "1:1016966032123:web:fbffd397c7d8494fa79e5e"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-
-  let currentLang = 'en';
-  let cart = [];
-
-  const productsContainer = document.getElementById('productsContainer');
-  const langToggle = document.getElementById('langToggle');
-  const searchInput = document.getElementById('searchInput');
-  const categoryFilter = document.getElementById('categoryFilter');
-  const cartIcon = document.getElementById('cartIcon');
-  const cartSidebar = document.getElementById('cartSidebar');
-  const cartItems = document.getElementById('cartItems');
-  const cartTotal = document.getElementById('cartTotal');
-  const cartCount = document.getElementById('cartCount');
-  const checkoutBtn = document.getElementById('checkoutBtn');
-  const checkoutModal = document.getElementById('checkoutModal');
-  const paymentMethod = document.getElementById('paymentMethod');
-  const paymentDetails = document.getElementById('paymentDetails');
-  const confirmPaymentBtn = document.getElementById('confirmPaymentBtn');
-
-  langToggle.addEventListener('click', () => {
-    currentLang = currentLang === 'en' ? 'ar' : 'en';
-    if(currentLang === 'ar'){
-      langToggle.textContent = 'English';
-      document.body.dir = 'rtl';
-    } else {
-      langToggle.textContent = 'عربي';
-      document.body.dir = 'ltr';
-    }
-    loadProducts();
-  });
-
-  cartIcon.addEventListener('click', () => {
-    cartSidebar.classList.toggle('open');
-  });
-
-  checkoutBtn.addEventListener('click', () => {
-    checkoutModal.style.display = 'block';
-  });
-
-  confirmPaymentBtn.addEventListener('click', async () => {
-    const method = paymentMethod.value;
-    if(!method) { alert('Please select payment method'); return; }
-    const order = { items: cart, total: getCartTotal(), paymentMethod: method, date: new Date() };
-    await db.collection('orders').add(order);
-    alert('Order saved!');
-    cart = [];
-    updateCartUI();
-    checkoutModal.style.display = 'none';
-  });
-
-  paymentMethod.addEventListener('change', () => {
-    let html = '';
-    if(paymentMethod.value === 'bank'){
-      html = '<input type="text" placeholder="Bank Account Number">';
-    } else if(paymentMethod.value === 'stcpay'){
-      html = '<input type="text" placeholder="STC Pay Number">';
-    } else if(paymentMethod.value === 'paypal'){
-      html = '<input type="email" placeholder="PayPal Email">';
-    } else if(paymentMethod.value === 'card'){
-      html = '<input type="text" placeholder="Card Number"><input type="text" placeholder="Expiry"><input type="text" placeholder="CVV">';
-    }
-    paymentDetails.innerHTML = html;
-  });
-
-  function loadProducts(){
-    productsContainer.innerHTML = 'Loading products...';
-    db.collection('products').get().then(snapshot => {
-      productsContainer.innerHTML = '';
-      let categories = new Set();
-      snapshot.forEach(doc => {
-        const product = doc.data();
-        categories.add(product.category || 'Other');
-        const productDiv = document.createElement('div');
-        productDiv.className = 'product';
-        productDiv.innerHTML = `
-          <img src="${product.image || 'https://via.placeholder.com/150'}" alt="${product.name}">
-          <h3>${product.name}</h3>
-          <p><strong>${currentLang === 'ar' ? 'السعر' : 'Price'}:</strong> $${product.price}</p>
-          <p>${product.description}</p>
-          <button onclick="addToCart('${doc.id}', '${product.name}', ${product.price})">${currentLang === 'ar' ? 'أضف للسلة' : 'Add to Cart'}</button>
-        `;
-        productsContainer.appendChild(productDiv);
-      });
-      categoryFilter.innerHTML = '<option value="">All Categories</option>' + Array.from(categories).map(c => `<option value="${c}">${c}</option>`).join('');
-    });
-  }
-
-  function addToCart(id, name, price){
-    cart.push({id, name, price});
-    updateCartUI();
-  }
-
-  function updateCartUI(){
-    cartItems.innerHTML = '';
-    cart.forEach(item => {
-      const li = document.createElement('li');
-      li.textContent = `${item.name} - $${item.price}`;
-      cartItems.appendChild(li);
-    });
-    cartTotal.textContent = `Total: $${getCartTotal()}`;
-    cartCount.textContent = cart.length;
-  }
-
-  function getCartTotal(){
-    return cart.reduce((sum, item) => sum + item.price, 0).toFixed(2);
-  }
-
-  searchInput.addEventListener('input', filterProducts);
-  categoryFilter.addEventListener('change', filterProducts);
-
-  function filterProducts(){
-    const searchValue = searchInput.value.toLowerCase();
-    const categoryValue = categoryFilter.value;
-    const products = document.querySelectorAll('.product');
-    products.forEach(p => {
-      const name = p.querySelector('h3').textContent.toLowerCase();
-      const category = p.getAttribute('data-category');
-      if(name.includes(searchValue) && (!categoryValue || category === categoryValue)){
-        p.style.display = '';
-      } else {
-        p.style.display = 'none';
-      }
-    });
-  }
-
-  loadProducts();
-</script>
 
 <footer>
   All Rights Reserved for Nidal Abu Samra 2025
 </footer>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+<script>
+/* ----------------------------
+   Firebase config - already provided
+   (Replace if needed)
+   ---------------------------- */
+const firebaseConfig = {
+  apiKey: "AIzaSyCcWgFDzs95TbVU7v5h_5O0lNzZvBlL90o",
+  authDomain: "baganiza-66bf0.firebaseapp.com",
+  projectId: "baganiza-66bf0",
+  storageBucket: "baganiza-66bf0.firebasestorage.app",
+  messagingSenderId: "1016966032123",
+  appId: "1:1016966032123:web:fbffd397c7d8494fa79e5e"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+/* App state */
+let PRODUCTS = [];               // products loaded from Firestore
+let CART = {};                   // { productId: {product, qty} }
+let currentLang = 'en';
+let selectedPayment = 'cash';
+
+/* DOM refs */
+const productsContainer = document.getElementById('productsContainer');
+const searchInput = document.getElementById('searchInput');
+const categoryFilter = document.getElementById('categoryFilter');
+const cartIcon = document.getElementById('cartIcon');
+const cartCount = document.getElementById('cartCount');
+const cartList = document.getElementById('cartList');
+const cartTotal = document.getElementById('cartTotal');
+const clearCartBtn = document.getElementById('clearCartBtn');
+const checkoutBtn = document.getElementById('checkoutBtn');
+const checkoutModal = document.getElementById('checkoutModal');
+const pmList = document.getElementById('pmList');
+const pmDetails = document.getElementById('pmDetails');
+const orderSummary = document.getElementById('orderSummary');
+const cancelCheckout = document.getElementById('cancelCheckout');
+const confirmCheckout = document.getElementById('confirmCheckout');
+const langToggle = document.getElementById('langToggle');
+const cartSidebar = document.getElementById('cartSidebar');
+
+/* Utility */
+function formatCurrency(n){ return '$' + Number(n).toFixed(2); }
+
+/* Load products from Firestore (keeps link with admin) */
+async function loadProducts(){
+  productsContainer.innerHTML = 'Loading products...';
+  try{
+    const snap = await db.collection('products').get();
+    PRODUCTS = [];
+    const categories = new Set();
+    snap.forEach(doc => {
+      const p = doc.data();
+      p.id = doc.id;
+      p.price = Number(p.price) || 0;
+      PRODUCTS.push(p);
+      categories.add(p.category || 'Other');
+    });
+
+    // fill categories
+    categoryFilter.innerHTML = '<option value="">All Categories</option>' +
+      Array.from(categories).map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
+
+    renderProducts();
+  }catch(err){
+    console.error(err);
+    productsContainer.innerHTML = '<div style="color:#ef4444">Failed to load products.</div>';
+  }
+}
+
+function renderProducts(){
+  productsContainer.innerHTML = '';
+  if (!PRODUCTS.length){
+    productsContainer.innerHTML = '<div>No products</div>';
+    return;
+  }
+
+  // Filter by search & category
+  const term = (searchInput.value || '').trim().toLowerCase();
+  const cat = categoryFilter.value || '';
+
+  // sort by name so similar appear together
+  const filtered = PRODUCTS
+    .filter(p => {
+      const name = (p.name || '').toLowerCase();
+      const desc = (p.description || '').toLowerCase();
+      const matchSearch = !term || name.includes(term) || desc.includes(term);
+      const matchCat = !cat || (p.category || '') === cat;
+      return matchSearch && matchCat;
+    })
+    .sort((a,b) => (a.name||'').localeCompare(b.name||''));
+
+  if (!filtered.length){
+    productsContainer.innerHTML = `<div style="padding:20px; color:var(--muted)">No products found.</div>`;
+    return;
+  }
+
+  filtered.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'product';
+    // set data-category for filtering
+    card.setAttribute('data-category', p.category || '');
+    card.innerHTML = `
+      <img src="${p.image || 'https://via.placeholder.com/400x300?text=No+Image'}" alt="${escapeHtml(p.name)}" />
+      <div>
+        <h3>${escapeHtml(p.name)}</h3>
+        <div class="price">${formatCurrency(p.price)}</div>
+        <div class="desc">${escapeHtml(p.description || '')}</div>
+      </div>
+      <div class="controls">
+        <button class="add-small">Add</button>
+        <div class="qty-bubble" aria-hidden="true">In cart: ${CART[p.id]?.qty || 0}</div>
+      </div>
+    `;
+    // Add button action
+    card.querySelector('.add-small').addEventListener('click', ()=> addToCart(p));
+    productsContainer.appendChild(card);
+  });
+}
+
+/* Escape helper */
+function escapeHtml(s){ return String(s || '').replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[c]); }
+
+/* Cart logic: aggregate quantities (no duplicates) */
+function addToCart(product){
+  if (!CART[product.id]) {
+    CART[product.id] = { product, qty: 0 };
+  }
+  CART[product.id].qty += 1;
+  updateCartUI();
+  renderProducts(); // update 'In cart' bubble
+}
+
+function decCart(productId){
+  if (!CART[productId]) return;
+  CART[productId].qty -= 1;
+  if (CART[productId].qty <= 0) delete CART[productId];
+  updateCartUI();
+  renderProducts();
+}
+
+function removeFromCart(productId){
+  delete CART[productId];
+  updateCartUI();
+  renderProducts();
+}
+
+function updateCartUI(){
+  // clear list
+  cartList.innerHTML = '';
+  const items = Object.values(CART);
+  if (items.length === 0){
+    cartList.innerHTML = `<li style="color:var(--muted)">Cart is empty</li>`;
+    cartCount.textContent = '0';
+    cartTotal.textContent = 'Total: $0.00';
+    return;
+  }
+  let total = 0;
+  items.forEach(({product, qty})=>{
+    total += product.price * qty;
+    const li = document.createElement('li');
+    li.className = 'cart-item';
+    li.innerHTML = `
+      <div class="left">
+        <div style="font-size:13px" class="title">${escapeHtml(product.name)}</div>
+        <div style="font-size:12px; color:var(--muted)">${formatCurrency(product.price)} × ${qty}</div>
+      </div>
+      <div class="cart-controls">
+        <button class="icon-btn dec">−</button>
+        <div style="min-width:26px; text-align:center; font-weight:700">${qty}</div>
+        <button class="icon-btn inc">+</button>
+        <button class="icon-btn remove" title="Remove">🗑</button>
+      </div>
+    `;
+    // attach events
+    li.querySelector('.inc').addEventListener('click', ()=> { CART[product.id].qty++; updateCartUI(); renderProducts(); });
+    li.querySelector('.dec').addEventListener('click', ()=> decCart(product.id) );
+    li.querySelector('.remove').addEventListener('click', ()=> removeFromCart(product.id) );
+    cartList.appendChild(li);
+  });
+  cartCount.textContent = items.reduce((s,i)=>s+i.qty,0);
+  cartTotal.textContent = `Total: ${formatCurrency(total)}`;
+}
+
+/* Clear cart */
+clearCartBtn.addEventListener('click', ()=> { CART = {}; updateCartUI(); renderProducts(); });
+
+/* Search & category filter */
+searchInput.addEventListener('input', ()=> renderProducts());
+categoryFilter.addEventListener('change', ()=> renderProducts());
+
+/* Cart icon toggle - scroll into view */
+cartIcon.addEventListener('click', ()=> {
+  // Scroll cart into view small screens; also highlight
+  cartSidebar.scrollIntoView({ behavior:'smooth', block:'center' });
+  cartSidebar.style.boxShadow = '0 24px 60px rgba(12,24,48,0.18)';
+  setTimeout(()=> cartSidebar.style.boxShadow = '0 18px 40px rgba(12,24,48,0.12)', 600);
+});
+
+/* Checkout modal flow */
+checkoutBtn.addEventListener('click', ()=>{
+  const items = Object.values(CART);
+  if (!items.length){ alert('Cart is empty'); return; }
+
+  // summary
+  let html = '';
+  let total = 0;
+  items.forEach(({product, qty})=>{
+    html += `${escapeHtml(product.name)} x${qty} — ${formatCurrency(product.price * qty)}<br/>`;
+    total += product.price * qty;
+  });
+  html += `<hr><div style="font-weight:700; margin-top:6px">Total: ${formatCurrency(total)}</div>`;
+  orderSummary.innerHTML = html;
+
+  // reset payment UI
+  pmList.querySelectorAll('.pm-item').forEach(el=> el.classList.remove('active'));
+  pmList.querySelector('.pm-item[data-method="cash"]').classList.add('active');
+  selectedPayment = 'cash';
+  renderPmDetails(selectedPayment);
+
+  checkoutModal.style.display = 'flex';
+  checkoutModal.setAttribute('aria-hidden','false');
+});
+
+/* Payment method selection (click handler) */
+pmList.addEventListener('click', (e)=>{
+  const el = e.target.closest('.pm-item');
+  if (!el) return;
+  const method = el.dataset.method;
+  selectedPayment = method;
+  pmList.querySelectorAll('.pm-item').forEach(it=> it.classList.toggle('active', it===el));
+  renderPmDetails(method);
+});
+
+function renderPmDetails(method){
+  if (method === 'cash'){
+    pmDetails.innerHTML = `<div style="padding:8px; color:var(--muted)">Pay in cash to the courier upon delivery.</div>`;
+  } else if (method === 'bank'){
+    pmDetails.innerHTML = `
+      <label>Bank Name <input id="bankName" type="text" style="width:100%; padding:8px; margin-top:6px; border-radius:8px; border:1px solid #e6eefc"></label>
+      <label>Account Number <input id="bankAccount" type="text" style="width:100%; padding:8px; margin-top:6px; border-radius:8px; border:1px solid #e6eefc"></label>
+    `;
+  } else if (method === 'stcpay'){
+    pmDetails.innerHTML = `<label>STC Pay Mobile <input id="stcPhone" type="tel" placeholder="+9665..." style="width:100%; padding:8px; margin-top:6px; border-radius:8px; border:1px solid #e6eefc"></label>`;
+  } else if (method === 'paypal'){
+    pmDetails.innerHTML = `<label>PayPal Email <input id="paypalEmail" type="email" style="width:100%; padding:8px; margin-top:6px; border-radius:8px; border:1px solid #e6eefc"></label>`;
+  } else if (method === 'card'){
+    pmDetails.innerHTML = `
+      <label>Card Number <input id="cardNumber" type="text" placeholder="1234 5678 9012 3456" style="width:100%; padding:8px; margin-top:6px; border-radius:8px; border:1px solid #e6eefc"></label>
+      <div style="display:flex; gap:8px; margin-top:8px;">
+        <input id="cardExpiry" type="month" style="flex:1; padding:8px; border-radius:8px; border:1px solid #e6eefc">
+        <input id="cardCVC" type="text" placeholder="CVC" style="width:100px; padding:8px; border-radius:8px; border:1px solid #e6eefc">
+      </div>
+    `;
+  }
+}
+
+/* Cancel checkout */
+cancelCheckout.addEventListener('click', ()=> {
+  checkoutModal.style.display = 'none';
+  checkoutModal.setAttribute('aria-hidden','true');
+});
+
+/* Confirm checkout - validate, save to Firestore */
+confirmCheckout.addEventListener('click', async ()=>{
+  const items = Object.values(CART);
+  if (!items.length){ alert('Cart empty'); return; }
+
+  // Payment validation
+  const payment = { method: selectedPayment };
+  if (selectedPayment === 'bank'){
+    const bankName = document.getElementById('bankName')?.value?.trim();
+    const bankAccount = document.getElementById('bankAccount')?.value?.trim();
+    if (!bankName || !bankAccount) { alert('Fill bank details'); return; }
+    payment.bankName = bankName; payment.bankAccount = bankAccount;
+  } else if (selectedPayment === 'stcpay'){
+    const stc = document.getElementById('stcPhone')?.value?.trim();
+    if (!stc) { alert('Fill STC Pay number'); return; }
+    payment.stcPhone = stc;
+  } else if (selectedPayment === 'paypal'){
+    const paypal = document.getElementById('paypalEmail')?.value?.trim();
+    if (!paypal) { alert('Fill PayPal email'); return; }
+    payment.paypalEmail = paypal;
+  } else if (selectedPayment === 'card'){
+    const card = document.getElementById('cardNumber')?.value?.trim();
+    const expiry = document.getElementById('cardExpiry')?.value?.trim();
+    const cvc = document.getElementById('cardCVC')?.value?.trim();
+    if (!card || !expiry || !cvc) { alert('Fill card details'); return; }
+    payment.card = { card, expiry, cvc };
+    // NOTE: card processing should be done via secure gateway (this is demo)
+  }
+
+  // Build order
+  const orderItems = items.map(({product, qty}) => ({ id: product.id, name: product.name, price: product.price, qty }));
+  const total = orderItems.reduce((s,i)=> s + i.price * i.qty, 0);
+  const order = { createdAt: new Date(), items: orderItems, total, payment, status:'pending' };
+
+  try{
+    const docRef = await db.collection('orders').add(order);
+    alert('Order saved! ID: ' + docRef.id);
+    // optionally: send invoice email via server or EmailJS (not included here)
+    CART = {}; updateCartUI(); checkoutModal.style.display = 'none';
+  }catch(e){
+    console.error(e);
+    alert('Failed to save order: ' + e.message);
+  }
+});
+
+/* Simple language toggle to re-render placeholder text */
+langToggle.addEventListener('click', ()=>{
+  if (currentLang === 'en'){ currentLang = 'ar'; langToggle.textContent = 'EN'; document.documentElement.dir='rtl'; }
+  else { currentLang = 'en'; langToggle.textContent = 'عربي'; document.documentElement.dir='ltr'; }
+  renderProducts();
+});
+
+/* initial load */
+loadProducts();
+updateCartUI(); // ensure UI correct on load
+</script>
 
 </body>
 </html>
