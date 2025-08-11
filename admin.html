@@ -57,10 +57,10 @@
 </div>
 
 <!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
 
 <script>
   const firebaseConfig = {
@@ -72,10 +72,10 @@
     appId: "1:1016966032123:web:fbffd397c7d8494fa79e5e"
   };
 
-  const app = firebase.initializeApp(firebaseConfig);
-  const auth = firebase.getAuth();
-  const db = firebase.getFirestore();
-  const storage = firebase.getStorage();
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+  const storage = firebase.storage();
 
   const loginForm = document.getElementById('loginForm');
   const adminPanel = document.getElementById('adminPanel');
@@ -93,7 +93,7 @@
   const progressFill = document.getElementById('progressFill');
   const productMessage = document.getElementById('productMessage');
 
-  firebase.onAuthStateChanged(auth, user => {
+  auth.onAuthStateChanged(user => {
     if(user){
       loginForm.style.display = 'none';
       adminPanel.style.display = 'block';
@@ -108,19 +108,19 @@
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value.trim();
     loginError.textContent = '';
-    firebase.signInWithEmailAndPassword(auth, email, password).catch(err => {
+    auth.signInWithEmailAndPassword(email, password).catch(err => {
       loginError.textContent = err.message;
     });
   });
 
   logoutBtn.addEventListener('click', () => {
-    firebase.signOut(auth);
+    auth.signOut();
     clearForm();
   });
 
   function loadProducts(){
     productsTableBody.innerHTML = '';
-    firebase.getDocs(firebase.collection(db, 'products')).then(snapshot => {
+    db.collection('products').get().then(snapshot => {
       snapshot.forEach(doc => {
         const product = doc.data();
         const tr = document.createElement('tr');
@@ -153,9 +153,8 @@
     }
 
     if(file){
-      const fileName = Date.now() + '_' + file.name;
-      const storageRef = firebase.ref(storage, 'productImages/' + fileName);
-      const uploadTask = firebase.uploadBytesResumable(storageRef, file);
+      const storageRef = storage.ref('productImages/' + Date.now() + '_' + file.name);
+      const uploadTask = storageRef.put(file);
 
       progressContainer.style.display = 'block';
 
@@ -170,7 +169,7 @@
           saveProductToDB(id, name, price, description, null); // save without image
         },
         () => {
-          firebase.getDownloadURL(uploadTask.snapshot.ref).then(downloadURL => {
+          uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {
             saveProductToDB(id, name, price, description, downloadURL);
           });
         }
@@ -184,10 +183,7 @@
     const data = { name, price, description };
     if(imageURL) data.imageURL = imageURL;
 
-    const saveAction = id
-      ? firebase.setDoc(firebase.doc(db, 'products', id), data)
-      : firebase.addDoc(firebase.collection(db, 'products'), data);
-
+    const saveAction = id ? db.collection('products').doc(id).set(data) : db.collection('products').add(data);
     saveAction.then(() => {
       productMessage.textContent = 'Product saved successfully.';
       clearForm();
@@ -197,10 +193,10 @@
     });
   }
 
-  window.editProduct = function(id){
-    firebase.getDoc(firebase.doc(db, 'products', id)).then(docSnap => {
-      if(docSnap.exists()){
-        const product = docSnap.data();
+  function editProduct(id){
+    db.collection('products').doc(id).get().then(doc => {
+      if(doc.exists){
+        const product = doc.data();
         productIdInput.value = id;
         productNameInput.value = product.name;
         productPriceInput.value = product.price;
@@ -209,9 +205,9 @@
     });
   }
 
-  window.deleteProduct = function(id){
+  function deleteProduct(id){
     if(confirm('Are you sure you want to delete this product?')){
-      firebase.deleteDoc(firebase.doc(db, 'products', id)).then(() => {
+      db.collection('products').doc(id).delete().then(() => {
         loadProducts();
       });
     }
