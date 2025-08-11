@@ -5,14 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Admin Panel - Manage Products</title>
 <style>
-  body { font-family: Arial, sans-serif; margin: 20px; }
-  #loginForm, #adminPanel { max-width: 600px; margin: auto; }
+  body { font-family: Arial, sans-serif; margin: 20px; background: #f4f4f9; }
+  #loginForm, #adminPanel { max-width: 700px; margin: auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
   table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-  th, td { border: 1px solid #ddd; padding: 8px; }
+  th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
   th { background-color: #f2f2f2; }
   input, button, textarea { padding: 8px; margin: 5px 0; width: 100%; box-sizing: border-box; }
-  button { cursor: pointer; }
-  #logoutBtn { margin-top: 10px; }
+  button { cursor: pointer; background: #4CAF50; color: white; border: none; border-radius: 4px; }
+  button:hover { background: #45a049; }
+  #logoutBtn { background: #d9534f; }
+  #logoutBtn:hover { background: #c9302c; }
 </style>
 </head>
 <body>
@@ -28,6 +30,7 @@
 <div id="adminPanel" style="display:none;">
   <h2>Admin Panel - Manage Products</h2>
   <button id="logoutBtn">Logout</button>
+
   <h3>Current Products</h3>
   <table id="productsTable">
     <thead>
@@ -35,6 +38,7 @@
     </thead>
     <tbody></tbody>
   </table>
+
   <h3>Add / Edit Product</h3>
   <input type="hidden" id="productId" />
   <input type="text" id="productName" placeholder="Name" />
@@ -83,6 +87,7 @@
   const productImageInput = document.getElementById('productImage');
   const productMessage = document.getElementById('productMessage');
 
+  // Show admin panel if logged in
   auth.onAuthStateChanged(user => {
     if(user){
       loginForm.style.display = 'none';
@@ -94,20 +99,24 @@
     }
   });
 
+  // Login
   loginBtn.addEventListener('click', () => {
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value.trim();
     loginError.textContent = '';
-    auth.signInWithEmailAndPassword(email, password).catch(err => {
-      loginError.textContent = err.message;
-    });
+    auth.signInWithEmailAndPassword(email, password)
+      .catch(err => {
+        loginError.textContent = err.message;
+      });
   });
 
+  // Logout
   logoutBtn.addEventListener('click', () => {
     auth.signOut();
     clearForm();
   });
 
+  // Load products from Firestore
   function loadProducts(){
     productsTableBody.innerHTML = '';
     db.collection('products').get().then(snapshot => {
@@ -119,7 +128,7 @@
           <td>${product.name}</td>
           <td>${product.price}</td>
           <td>${product.description}</td>
-          <td>${product.imageUrl ? `<img src="${product.imageUrl}" width="50">` : ''}</td>
+          <td>${product.imageUrl ? `<img src="${product.imageUrl}" width="50"/>` : 'No Image'}</td>
           <td>
             <button onclick="editProduct('${doc.id}')">Edit</button>
             <button onclick="deleteProduct('${doc.id}')">Delete</button>
@@ -130,6 +139,7 @@
     });
   }
 
+  // Save (add/edit) product
   saveProductBtn.addEventListener('click', async () => {
     const id = productIdInput.value;
     const name = productNameInput.value.trim();
@@ -143,32 +153,39 @@
     }
 
     let imageUrl = null;
-    if(imageFile){
-      const storageRef = storage.ref(`product_images/${Date.now()}_${imageFile.name}`);
-      await storageRef.put(imageFile);
-      imageUrl = await storageRef.getDownloadURL();
+
+    try {
+      if (imageFile) {
+        const storageRef = storage.ref(`product_images/${Date.now()}_${imageFile.name}`);
+        const snapshot = await storageRef.put(imageFile);
+        imageUrl = await snapshot.ref.getDownloadURL();
+      }
+    } catch (err) {
+      alert('Error uploading image: ' + err.message);
+      return;
     }
 
     const productData = { name, price, description };
-    if(imageUrl) productData.imageUrl = imageUrl;
+    if (imageUrl) productData.imageUrl = imageUrl;
 
-    if(id){
-      db.collection('products').doc(id).set(productData, { merge: true }).then(() => {
+    try {
+      if (id) {
+        await db.collection('products').doc(id).set(productData, { merge: true });
         productMessage.textContent = 'Product updated successfully.';
-        clearForm();
-        loadProducts();
-      });
-    } else {
-      const newId = db.collection('products').doc().id;
-      db.collection('products').doc(newId).set(productData).then(() => {
+      } else {
+        const newId = db.collection('products').doc().id;
+        await db.collection('products').doc(newId).set(productData);
         productMessage.textContent = 'Product added successfully.';
-        clearForm();
-        loadProducts();
-      });
+      }
+      clearForm();
+      loadProducts();
+    } catch (err) {
+      alert('Error saving product: ' + err.message);
     }
   });
 
-  window.editProduct = function(id){
+  // Edit product
+  function editProduct(id){
     db.collection('products').doc(id).get().then(doc => {
       if(doc.exists){
         const product = doc.data();
@@ -180,14 +197,17 @@
     });
   }
 
-  window.deleteProduct = function(id){
+  // Delete product
+  function deleteProduct(id){
     if(confirm('Are you sure you want to delete this product?')){
-      db.collection('products').doc(id).delete().then(() => {
-        loadProducts();
-      });
+      db.collection('products').doc(id).delete()
+        .then(() => {
+          loadProducts();
+        });
     }
   }
 
+  // Clear form
   function clearForm(){
     productIdInput.value = '';
     productNameInput.value = '';
