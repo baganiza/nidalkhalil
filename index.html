@@ -2,104 +2,212 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>BAGANIZA Store (Nidal Abu Samra)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BAGANIZA STORE</title>
 <style>
-  body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f9f9f9; }
-  header { background-color: #333; color: white; padding: 10px; text-align: center; }
-  header h1 { margin: 0; font-size: 24px; }
-  header small { font-size: 14px; color: gold; display: block; }
-  .container { display: flex; flex-wrap: wrap; justify-content: center; padding: 10px; }
-  .product { border: 1px solid #ddd; margin: 10px; padding: 10px; width: 220px; background: white; border-radius: 5px; text-align: center; }
-  .product img { max-width: 100%; height: auto; margin-bottom: 10px; border-radius: 5px; }
-  .product h3 { margin: 0 0 10px; font-size: 18px; }
-  .product p { margin: 5px 0; }
-  .cart { position: fixed; top: 10px; right: 10px; background: white; border: 1px solid #ddd; padding: 10px; width: 250px; border-radius: 5px; }
-  .cart h2 { margin-top: 0; }
-  button { padding: 5px 10px; margin-top: 5px; cursor: pointer; }
-  @media (max-width: 600px) {
-    .container { flex-direction: column; align-items: center; }
-    .product { width: 90%; }
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background: linear-gradient(135deg, #f0f4f8, #d9e4f5);
+    color: #333;
+  }
+  header {
+    background: #1e293b;
+    color: white;
+    padding: 20px;
+    text-align: center;
+  }
+  header h1 {
+    margin: 0;
+    font-size: 2em;
+  }
+  header h1 span {
+    font-size: 0.6em;
+    color: #facc15;
+    text-shadow: 0 0 5px rgba(255,255,255,0.7);
+  }
+  .container {
+    max-width: 1200px;
+    margin: auto;
+    padding: 20px;
+  }
+  .search-bar {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
+  }
+  .search-bar input, .search-bar select {
+    padding: 10px;
+    flex: 1;
+  }
+  .products {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+  }
+  .product {
+    background: white;
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .product img {
+    max-width: 100%;
+    max-height: 150px;
+    object-fit: contain;
+    border-radius: 5px;
+    margin-bottom: 10px;
+  }
+  .product button {
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .cart {
+    margin-top: 30px;
+    background: #f8fafc;
+    padding: 15px;
+    border-radius: 8px;
+  }
+  .cart-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .checkout {
+    background: #16a34a;
+    color: white;
+    padding: 10px;
+    text-align: center;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
   }
 </style>
 </head>
 <body>
 
 <header>
-  <h1>BAGANIZA STORE</h1>
-  <small>(Nidal Abu Samra)</small>
+  <h1>BAGANIZA STORE <span>(nIDAL aBU sAMRA)</span></h1>
+  <p>All Rights Reserved for Nidal Abu Samra 2025</p>
 </header>
 
-<div class="container" id="productList"></div>
+<div class="container">
+  <div class="search-bar">
+    <input type="text" id="searchInput" placeholder="Search products...">
+    <select id="categoryFilter">
+      <option value="">All Categories</option>
+      <option value="electronics">Electronics</option>
+      <option value="clothing">Clothing</option>
+      <option value="accessories">Accessories</option>
+    </select>
+  </div>
 
-<div class="cart" id="cart">
-  <h2>Shopping Cart</h2>
-  <ul id="cartItems"></ul>
-  <button id="checkoutBtn">Checkout</button>
+  <div class="products" id="productsList"></div>
+
+  <div class="cart" id="cartSection">
+    <h3>Your Cart</h3>
+    <div id="cartItems"></div>
+    <div class="checkout" id="checkoutBtn">Checkout</div>
+  </div>
 </div>
 
-<!-- Firebase -->
+<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
 <script>
-  // Firebase config
-  const firebaseConfig = {
-    apiKey: "AIzaSyCcWgFDzs95TbVU7v5h_5O0lNzZvBlL90o",
-    authDomain: "baganiza-66bf0.firebaseapp.com",
-    projectId: "baganiza-66bf0",
-    storageBucket: "baganiza-66bf0.appspot.com",
-    messagingSenderId: "1016966032123",
-    appId: "1:1016966032123:web:fbffd397c7d8494fa79e5e"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
+const firebaseConfig = {
+  apiKey: "AIzaSyCcWgFDzs95TbVU7v5h_5O0lNzZvBlL90o",
+  authDomain: "baganiza-66bf0.firebaseapp.com",
+  projectId: "baganiza-66bf0",
+  storageBucket: "baganiza-66bf0.appspot.com",
+  messagingSenderId: "1016966032123",
+  appId: "1:1016966032123:web:fbffd397c7d8494fa79e5e"
+};
 
-  const productList = document.getElementById('productList');
-  const cartItems = document.getElementById('cartItems');
-  let cart = [];
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
-  // Load products
-  function loadProducts(){
-    productList.innerHTML = '';
-    db.collection('products').get().then(snapshot => {
-      snapshot.forEach(doc => {
-        const product = doc.data();
-        const div = document.createElement('div');
-        div.classList.add('product');
-        div.innerHTML = `
-          ${product.imageUrl ? `<img src="${product.imageUrl}" alt="${product.name}">` : ''}
-          <h3>${product.name}</h3>
-          <p>Price: $${product.price}</p>
-          <p>${product.description}</p>
-          <button onclick="addToCart('${doc.id}', '${product.name}', ${product.price})">Add to Cart</button>
-        `;
-        productList.appendChild(div);
-      });
+let products = [];
+let cart = {};
+
+function loadProducts(){
+  db.collection('products').get().then(snapshot => {
+    products = [];
+    snapshot.forEach(doc => {
+      let product = doc.data();
+      product.id = doc.id;
+      products.push(product);
     });
-  }
-
-  loadProducts();
-
-  // Add to cart
-  function addToCart(id, name, price){
-    cart.push({id, name, price});
-    renderCart();
-  }
-
-  // Render cart
-  function renderCart(){
-    cartItems.innerHTML = '';
-    cart.forEach((item) => {
-      const li = document.createElement('li');
-      li.textContent = `${item.name} - $${item.price}`;
-      cartItems.appendChild(li);
-    });
-  }
-
-  document.getElementById('checkoutBtn').addEventListener('click', () => {
-    alert('Proceeding to checkout...');
+    displayProducts(products);
   });
+}
+
+function displayProducts(list){
+  const productsList = document.getElementById('productsList');
+  productsList.innerHTML = '';
+  list.forEach(p => {
+    const div = document.createElement('div');
+    div.className = 'product';
+    div.innerHTML = `
+      ${p.imageUrl ? `<img src="${p.imageUrl}" alt="${p.name}">` : `<img src="no-image.png" alt="No Image">`}
+      <h4>${p.name}</h4>
+      <p>$${p.price}</p>
+      <button onclick="addToCart('${p.id}')">Add to Cart</button>
+    `;
+    productsList.appendChild(div);
+  });
+}
+
+function addToCart(id){
+  if(cart[id]){
+    cart[id].qty += 1;
+  } else {
+    let product = products.find(p => p.id === id);
+    cart[id] = { ...product, qty: 1 };
+  }
+  displayCart();
+}
+
+function displayCart(){
+  const cartItems = document.getElementById('cartItems');
+  cartItems.innerHTML = '';
+  Object.values(cart).forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'cart-item';
+    div.innerHTML = `<span>${item.name} (x${item.qty})</span> <span>$${item.price * item.qty}</span>`;
+    cartItems.appendChild(div);
+  });
+}
+
+document.getElementById('searchInput').addEventListener('input', e => {
+  const searchValue = e.target.value.toLowerCase();
+  const filtered = products.filter(p => p.name.toLowerCase().includes(searchValue));
+  displayProducts(filtered);
+});
+
+document.getElementById('categoryFilter').addEventListener('change', e => {
+  const category = e.target.value;
+  if(category){
+    const filtered = products.filter(p => (p.category || '').toLowerCase() === category);
+    displayProducts(filtered);
+  } else {
+    displayProducts(products);
+  }
+});
+
+document.getElementById('checkoutBtn').addEventListener('click', () => {
+  alert('Proceeding to payment...');
+});
+
+loadProducts();
 </script>
 </body>
 </html>
