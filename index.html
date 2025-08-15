@@ -1,93 +1,110 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>BAGANIZA STORE</title>
 <style>
   body {
-    font-family: Arial, sans-serif;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #f8f4f0, #f0ece8);
     margin: 0;
-    background: linear-gradient(135deg, #f0f4f8, #d9e4f5);
+    padding: 0;
     color: #333;
   }
   header {
-    background: #1e293b;
-    color: white;
-    padding: 20px;
-    text-align: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: #ff6f61;
+    color: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 10;
   }
   header h1 {
+    font-size: 22px;
     margin: 0;
-    font-size: 2em;
+    font-weight: bold;
   }
   header h1 span {
-    font-size: 0.6em;
-    color: #facc15;
-    text-shadow: 0 0 5px rgba(255,255,255,0.7);
+    font-size: 14px;
+    font-weight: normal;
+    color: gold;
   }
-  .container {
-    max-width: 1200px;
-    margin: auto;
-    padding: 20px;
-  }
-  .search-bar {
-    margin-bottom: 20px;
-    display: flex;
-    gap: 10px;
-  }
-  .search-bar input, .search-bar select {
-    padding: 10px;
-    flex: 1;
+  #cartBtn {
+    background: #fff;
+    color: #ff6f61;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
   }
   .products {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 15px;
+    padding: 20px;
+  }
+  @media(max-width: 768px){
+    .products {
+      grid-template-columns: repeat(3, 1fr);
+    }
   }
   .product {
-    background: white;
-    border-radius: 8px;
-    padding: 10px;
+    background: #fff;
+    border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    padding: 15px;
+    text-align: center;
     display: flex;
     flex-direction: column;
-    align-items: center;
   }
   .product img {
     max-width: 100%;
-    max-height: 150px;
-    object-fit: contain;
-    border-radius: 5px;
+    border-radius: 8px;
     margin-bottom: 10px;
   }
+  .product h3 {
+    margin: 5px 0;
+  }
+  .product p {
+    flex: 1;
+    font-size: 14px;
+    color: #555;
+  }
   .product button {
-    background: #2563eb;
-    color: white;
+    background: #ff6f61;
+    color: #fff;
     border: none;
-    padding: 8px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  .cart {
-    margin-top: 30px;
-    background: #f8fafc;
-    padding: 15px;
+    padding: 8px;
     border-radius: 8px;
-  }
-  .cart-item {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 8px;
-  }
-  .checkout {
-    background: #16a34a;
-    color: white;
-    padding: 10px;
-    text-align: center;
-    border-radius: 4px;
     cursor: pointer;
-    margin-top: 10px;
+  }
+  /* Modal styles */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 20;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.5);
+  }
+  .modal-content {
+    background: #fff;
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 400px;
+  }
+  footer {
+    text-align: center;
+    padding: 15px;
+    font-size: 12px;
+    color: #777;
   }
 </style>
 </head>
@@ -95,119 +112,119 @@
 
 <header>
   <h1>BAGANIZA STORE <span>(nIDAL aBU sAMRA)</span></h1>
-  <p>All Rights Reserved for Nidal Abu Samra 2025</p>
+  <button id="cartBtn">🛒 السلة (0)</button>
 </header>
 
-<div class="container">
-  <div class="search-bar">
-    <input type="text" id="searchInput" placeholder="Search products...">
-    <select id="categoryFilter">
-      <option value="">All Categories</option>
-      <option value="electronics">Electronics</option>
-      <option value="clothing">Clothing</option>
-      <option value="accessories">Accessories</option>
-    </select>
-  </div>
+<main class="products" id="productsList"></main>
 
-  <div class="products" id="productsList"></div>
-
-  <div class="cart" id="cartSection">
-    <h3>Your Cart</h3>
-    <div id="cartItems"></div>
-    <div class="checkout" id="checkoutBtn">Checkout</div>
+<!-- Cart Modal -->
+<div id="cartModal" class="modal">
+  <div class="modal-content">
+    <h3>سلة المشتريات</h3>
+    <ul id="cartItems"></ul>
+    <button id="checkoutBtn">Checkout</button>
+    <button onclick="closeCart()">إغلاق</button>
   </div>
 </div>
 
-<!-- Firebase SDK -->
+<!-- Payment Modal -->
+<div id="paymentModal" class="modal">
+  <div class="modal-content">
+    <h3>اختر طريقة الدفع</h3>
+    <select id="paymentMethod">
+      <option value="cash">دفع عند الاستلام</option>
+      <option value="card">بطاقة ائتمان</option>
+    </select>
+    <input type="text" id="paymentInfo" placeholder="أدخل البيانات المطلوبة">
+    <button id="confirmPayment">تأكيد الدفع</button>
+    <button onclick="closePayment()">إغلاق</button>
+  </div>
+</div>
+
+<footer>All Right Reserved for Nidal Abu Samra 2025</footer>
+
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-
 <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyCcWgFDzs95TbVU7v5h_5O0lNzZvBlL90o",
-  authDomain: "baganiza-66bf0.firebaseapp.com",
-  projectId: "baganiza-66bf0",
-  storageBucket: "baganiza-66bf0.appspot.com",
-  messagingSenderId: "1016966032123",
-  appId: "1:1016966032123:web:fbffd397c7d8494fa79e5e"
-};
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_AUTH_DOMAIN",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_BUCKET",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-
-let products = [];
-let cart = {};
-
-function loadProducts(){
-  db.collection('products').get().then(snapshot => {
-    products = [];
-    snapshot.forEach(doc => {
-      let product = doc.data();
-      product.id = doc.id;
-      products.push(product);
-    });
-    displayProducts(products);
-  });
-}
-
-function displayProducts(list){
   const productsList = document.getElementById('productsList');
-  productsList.innerHTML = '';
-  list.forEach(p => {
-    const div = document.createElement('div');
-    div.className = 'product';
-    div.innerHTML = `
-      ${p.imageUrl ? `<img src="${p.imageUrl}" alt="${p.name}">` : `<img src="no-image.png" alt="No Image">`}
-      <h4>${p.name}</h4>
-      <p>$${p.price}</p>
-      <button onclick="addToCart('${p.id}')">Add to Cart</button>
-    `;
-    productsList.appendChild(div);
-  });
-}
+  const cartBtn = document.getElementById('cartBtn');
+  const cartModal = document.getElementById('cartModal');
+  const cartItemsEl = document.getElementById('cartItems');
+  const checkoutBtn = document.getElementById('checkoutBtn');
+  const paymentModal = document.getElementById('paymentModal');
+  const confirmPayment = document.getElementById('confirmPayment');
+  let cart = {};
 
-function addToCart(id){
-  if(cart[id]){
-    cart[id].qty += 1;
-  } else {
-    let product = products.find(p => p.id === id);
-    cart[id] = { ...product, qty: 1 };
+  function renderProducts() {
+    db.collection('products').get().then(snapshot => {
+      productsList.innerHTML = '';
+      snapshot.forEach(doc => {
+        const p = doc.data();
+        const imgTag = p.imageUrl ? `<img src="${p.imageUrl}" alt="${p.name}">` : '';
+        productsList.innerHTML += `
+          <div class="product">
+            ${imgTag}
+            <h3>${p.name}</h3>
+            <p>${p.description}</p>
+            <strong>${p.price} $</strong>
+            <button onclick="addToCart('${doc.id}', '${p.name}', ${p.price})">إضافة للسلة</button>
+          </div>
+        `;
+      });
+    });
   }
-  displayCart();
-}
 
-function displayCart(){
-  const cartItems = document.getElementById('cartItems');
-  cartItems.innerHTML = '';
-  Object.values(cart).forEach(item => {
-    const div = document.createElement('div');
-    div.className = 'cart-item';
-    div.innerHTML = `<span>${item.name} (x${item.qty})</span> <span>$${item.price * item.qty}</span>`;
-    cartItems.appendChild(div);
-  });
-}
-
-document.getElementById('searchInput').addEventListener('input', e => {
-  const searchValue = e.target.value.toLowerCase();
-  const filtered = products.filter(p => p.name.toLowerCase().includes(searchValue));
-  displayProducts(filtered);
-});
-
-document.getElementById('categoryFilter').addEventListener('change', e => {
-  const category = e.target.value;
-  if(category){
-    const filtered = products.filter(p => (p.category || '').toLowerCase() === category);
-    displayProducts(filtered);
-  } else {
-    displayProducts(products);
+  function addToCart(id, name, price) {
+    if(cart[id]) {
+      cart[id].qty++;
+    } else {
+      cart[id] = { name, price, qty: 1 };
+    }
+    updateCartBtn();
   }
-});
 
-document.getElementById('checkoutBtn').addEventListener('click', () => {
-  alert('Proceeding to payment...');
-});
+  function updateCartBtn() {
+    let totalQty = Object.values(cart).reduce((sum, item) => sum + item.qty, 0);
+    cartBtn.textContent = `🛒 السلة (${totalQty})`;
+  }
 
-loadProducts();
+  cartBtn.onclick = () => {
+    cartItemsEl.innerHTML = '';
+    for(let id in cart) {
+      let item = cart[id];
+      cartItemsEl.innerHTML += `<li>${item.name} × ${item.qty} — ${item.price * item.qty} $</li>`;
+    }
+    cartModal.style.display = 'block';
+  };
+
+  function closeCart() { cartModal.style.display = 'none'; }
+  function closePayment() { paymentModal.style.display = 'none'; }
+
+  checkoutBtn.onclick = () => {
+    cartModal.style.display = 'none';
+    paymentModal.style.display = 'block';
+  };
+
+  confirmPayment.onclick = () => {
+    alert("تم الدفع وحفظ الطلب في Firebase");
+    paymentModal.style.display = 'none';
+    cart = {};
+    updateCartBtn();
+  };
+
+  renderProducts();
 </script>
 </body>
 </html>
