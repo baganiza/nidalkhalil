@@ -1,548 +1,105 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>BAGANIZA Store (nIDAL aBU sAMRA)</title>
-
-<!-- Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BAGANIZA Store (Nidal Abu Samra)</title>
 <style>
-  :root{
-    --brand:#1f6feb;
-    --accent:#ffb457;
-    --bg1:#eef6ff;
-    --bg2:#e7f0ff;
-    --card:#ffffff;
-    --muted:#6b7280;
-  }
-  *{box-sizing:border-box}
-  body{
-    margin:0;
-    font-family:Inter, Arial, sans-serif;
-    -webkit-font-smoothing:antialiased;
-    background: linear-gradient(180deg,var(--bg1),var(--bg2));
-    color:#07203a;
-  }
-
-  /* Header */
-  header{
-    display:flex;
-    gap:12px;
-    align-items:center;
-    justify-content:space-between;
-    padding:14px 18px;
-    background: linear-gradient(90deg,#07203a,var(--brand));
-    color:white;
-    position:sticky; top:0; z-index:100;
-    box-shadow:0 6px 18px rgba(5,20,40,0.18);
-  }
-  .brand {
-    display:flex; align-items:center; gap:12px;
-  }
-  .brand-title {
-    font-family:'Playfair Display', serif;
-    margin:0; font-size:22px; letter-spacing:0.6px;
-  }
-  .brand-sub {
-    display:block; font-size:11px; color:rgba(255,255,255,0.9);
-    text-transform:none; font-weight:600; margin-top:-4px;
-    text-shadow: 0 1px 6px rgba(255,255,255,0.25);
-    opacity:0.95;
-  }
-
-  /* controls */
-  .controls { display:flex; gap:10px; align-items:center; }
-  .search {
-    padding:8px 12px; border-radius:10px; border:none; outline:none;
-    min-width:190px;
-  }
-  .filter {
-    padding:8px 10px; border-radius:10px; border:none; min-width:150px;
-  }
-  .btn {
-    background:var(--accent); border:none; padding:8px 12px; border-radius:10px; cursor:pointer; font-weight:700;
-  }
-  .lang-btn { background:transparent; border:1px solid rgba(255,255,255,0.12); color:white; padding:6px 10px; border-radius:8px; }
-
-  .cart-btn {
-    position:relative; background:rgba(255,255,255,0.06); border-radius:8px; padding:8px; border:none; color:white;
-    cursor:pointer; display:flex; align-items:center; gap:8px;
-  }
-  .cart-count {
-    position:absolute; top:-6px; right:-6px; background:gold; color:black; padding:3px 6px; border-radius:50%; font-weight:800; font-size:12px;
-    box-shadow:0 2px 6px rgba(0,0,0,0.15);
-  }
-
-  /* layout */
-  main { max-width:1200px; margin:20px auto; padding:0 18px; }
-  #productsContainer {
-    display:grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 per row always */
-    gap:16px;
-  }
-
-  .product {
-    background:var(--card); border-radius:12px; padding:10px; display:flex; flex-direction:column; justify-content:space-between;
-    box-shadow:0 10px 24px rgba(15,35,70,0.06); transition:transform .16s ease, box-shadow .16s ease;
-    min-height:160px;
-  }
-  .product:hover{ transform:translateY(-6px); box-shadow:0 18px 40px rgba(10,30,70,0.12); }
-  .product .img { width:100%; height:120px; object-fit:cover; border-radius:8px; background:#f5f7fa; }
-  .product h3 { margin:10px 0 6px; font-size:15px; color:#0b3d91; }
-  .price { font-weight:700; color:var(--brand); }
-  .desc { color:var(--muted); font-size:13px; min-height:36px; }
-  .controls-row { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:8px; }
-  .add-btn { background:var(--brand); color:white; border:none; padding:8px 10px; border-radius:8px; cursor:pointer; font-weight:700; font-size:13px; }
-  .qty-badge { background:#f3f6ff; padding:6px 8px; border-radius:999px; font-weight:700; color:#0b3d91; font-size:13px; }
-
-  /* cart sidebar */
-  #cartSidebar {
-    position:fixed; right:18px; top:84px; width:320px; max-height:76vh; overflow:auto; z-index:80;
-    background:linear-gradient(180deg,#ffffff,#fbfdff); padding:14px; border-radius:12px; box-shadow:0 18px 40px rgba(12,24,48,0.12);
-  }
-  #cartSidebar h2{ margin:0 0 8px 0; color:var(--brand) }
-  .cart-list { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:10px; }
-  .cart-item { display:flex; justify-content:space-between; gap:8px; align-items:center; background:#fbfdff; padding:8px; border-radius:8px; border:1px solid #f1f5f9; }
-  .cart-item .title { font-weight:700; font-size:13px; }
-  .cart-item .meta { color:var(--muted); font-size:13px; }
-  .cart-controls { display:flex; gap:6px; align-items:center; }
-  .icon-btn { background:#eef2ff; border:none; padding:6px 8px; border-radius:8px; cursor:pointer; }
-
-  #totalPrice { margin-top:12px; font-weight:800; color:#ef4444; background:#fff0f0; padding:8px; border-radius:8px; text-align:center; }
-
-  /* checkout modal */
-  .modal { position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(3,7,18,0.5); z-index:200; padding:18px; }
-  .modal-box { width:100%; max-width:820px; background:white; border-radius:12px; padding:18px; max-height:90vh; overflow:auto; box-shadow:0 20px 60px rgba(2,6,23,0.35); }
-
-  .pm-list { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
-  .pm-item { padding:10px 12px; border-radius:8px; background:#fbfdff; cursor:pointer; border:1px solid #eef6ff; }
-  .pm-item.active { border-color:var(--brand); box-shadow:0 10px 30px rgba(31,111,235,0.08); }
-
-  /* footer */
-  footer { margin-top:26px; text-align:center; padding:12px; color:white; background:linear-gradient(90deg,#07203a,var(--brand)); font-size:14px; }
-
-  /* responsive: keep 3 columns but shrink sizes on small screens */
-  @media (max-width:920px){
-    #productsContainer { gap:12px; }
-  }
-  @media (max-width:520px){
-    #productsContainer { grid-template-columns: repeat(3, 1fr); gap:8px; }
-    .product .img { height:90px; }
-    .product { padding:8px; min-height:120px; }
-    header { padding:10px; }
-    .search { min-width:110px; }
-    /* put cartSidebar as full-width on top on small screens so it doesn't cover products */
-    #cartSidebar { position:static; width:100%; margin:12px auto 0 auto; right:auto; top:auto; box-shadow:0 6px 20px rgba(12,24,48,0.08); }
+  body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f9f9f9; }
+  header { background-color: #333; color: white; padding: 10px; text-align: center; }
+  header h1 { margin: 0; font-size: 24px; }
+  header small { font-size: 14px; color: gold; display: block; }
+  .container { display: flex; flex-wrap: wrap; justify-content: center; padding: 10px; }
+  .product { border: 1px solid #ddd; margin: 10px; padding: 10px; width: 220px; background: white; border-radius: 5px; text-align: center; }
+  .product img { max-width: 100%; height: auto; margin-bottom: 10px; border-radius: 5px; }
+  .product h3 { margin: 0 0 10px; font-size: 18px; }
+  .product p { margin: 5px 0; }
+  .cart { position: fixed; top: 10px; right: 10px; background: white; border: 1px solid #ddd; padding: 10px; width: 250px; border-radius: 5px; }
+  .cart h2 { margin-top: 0; }
+  button { padding: 5px 10px; margin-top: 5px; cursor: pointer; }
+  @media (max-width: 600px) {
+    .container { flex-direction: column; align-items: center; }
+    .product { width: 90%; }
   }
 </style>
 </head>
 <body>
 
 <header>
-  <div class="brand">
-    <div>
-      <div class="brand-title">BAGANIZA Store</div>
-      <div class="brand-sub">(nIDAL aBU sAMRA)</div>
-    </div>
-  </div>
-
-  <div class="controls" role="search">
-    <input id="searchInput" class="search" type="search" placeholder="Search products..." aria-label="Search products"/>
-    <select id="categoryFilter" class="filter" aria-label="Filter by category"><option value="">All Categories</option></select>
-    <button id="langToggle" class="lang-btn" aria-pressed="false">عربي</button>
-    <button id="cartButton" class="cart-btn" aria-controls="cartSidebar" title="Open cart">🛒 Shopping Cart <span id="cartCount" class="cart-count">0</span></button>
-  </div>
+  <h1>BAGANIZA STORE</h1>
+  <small>(Nidal Abu Samra)</small>
 </header>
 
-<main>
-  <section id="productsContainer" aria-live="polite" aria-label="Products"></section>
-</main>
+<div class="container" id="productList"></div>
 
-<!-- Cart Sidebar -->
-<aside id="cartSidebar" aria-label="Shopping Cart">
+<div class="cart" id="cart">
   <h2>Shopping Cart</h2>
-  <ul id="cartList" class="cart-list"><li style="color:var(--muted)">Cart is empty</li></ul>
-  <div id="totalPrice">Total: $0.00</div>
-  <div style="display:flex; gap:8px; margin-top:12px;">
-    <button id="clearCart" class="btn" style="background:#f97316">Clear</button>
-    <button id="openCheckout" class="btn">Checkout</button>
-  </div>
-</aside>
-
-<!-- Checkout Modal -->
-<div id="checkoutModal" class="modal" aria-hidden="true" role="dialog" aria-modal="true">
-  <div class="modal-box">
-    <h2>Checkout & Payment</h2>
-
-    <section>
-      <strong>Order summary</strong>
-      <div id="orderSummary" style="margin-top:8px; font-size:14px;"></div>
-    </section>
-
-    <section style="margin-top:12px;">
-      <strong>Choose payment method</strong>
-      <div id="pmList" class="pm-list">
-        <div class="pm-item active" data-method="cash">Cash on Delivery</div>
-        <div class="pm-item" data-method="bank">Bank Transfer</div>
-        <div class="pm-item" data-method="stcpay">STC Pay</div>
-        <div class="pm-item" data-method="paypal">PayPal</div>
-        <div class="pm-item" data-method="card">Credit Card</div>
-      </div>
-      <div id="pmDetails" style="margin-top:12px"></div>
-    </section>
-
-    <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:16px;">
-      <button id="cancelCheckoutBtn" class="btn" style="background:#94a3b8">Cancel</button>
-      <button id="confirmCheckoutBtn" class="btn" style="background:var(--brand); color:white">Confirm & Pay</button>
-    </div>
-  </div>
+  <ul id="cartItems"></ul>
+  <button id="checkoutBtn">Checkout</button>
 </div>
 
-<footer>BAGANIZA Store — All Rights Reserved for Nidal Abu Samra 2025</footer>
-
-<!-- Firebase (compat) -->
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
-
-<!-- EmailJS (for sending invoice) -->
-<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
 
 <script>
-/* =======================
-   CONFIG - replace values if needed
-   ======================= */
-const firebaseConfig = {
-  apiKey: "AIzaSyCcWgFDzs95TbVU7v5h_5O0lNzZvBlL90o",
-  authDomain: "baganiza-66bf0.firebaseapp.com",
-  projectId: "baganiza-66bf0",
-  storageBucket: "baganiza-66bf0.firebasestorage.app",
-  messagingSenderId: "1016966032123",
-  appId: "1:1016966032123:web:fbffd397c7d8494fa79e5e"
-};
+  // Firebase config
+  const firebaseConfig = {
+    apiKey: "AIzaSyCcWgFDzs95TbVU7v5h_5O0lNzZvBlL90o",
+    authDomain: "baganiza-66bf0.firebaseapp.com",
+    projectId: "baganiza-66bf0",
+    storageBucket: "baganiza-66bf0.appspot.com",
+    messagingSenderId: "1016966032123",
+    appId: "1:1016966032123:web:fbffd397c7d8494fa79e5e"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
 
-// EmailJS config - set your values to send email invoices (optional)
-const EMAILJS_USER_ID = "REPLACE_WITH_EMAILJS_USERID";
-const EMAILJS_SERVICE_ID = "REPLACE_WITH_EMAILJS_SERVICEID";
-const EMAILJS_TEMPLATE_ID = "REPLACE_WITH_EMAILJS_TEMPLATEID";
+  const productList = document.getElementById('productList');
+  const cartItems = document.getElementById('cartItems');
+  let cart = [];
 
-/* =======================
-   Initialize services
-   ======================= */
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-const storage = firebase.storage();
-
-// init EmailJS if present
-if (typeof emailjs !== 'undefined' && EMAILJS_USER_ID && EMAILJS_USER_ID !== 'REPLACE_WITH_EMAILJS_USERID') {
-  emailjs.init(EMAILJS_USER_ID);
-}
-
-/* =======================
-   App state
-   ======================= */
-let PRODUCTS = [];       // products from Firestore
-let CART = {};           // { productId: { product, qty } }
-let selectedPayment = 'cash';
-let currentLang = 'en';
-
-/* =======================
-   DOM refs
-   ======================= */
-const productsContainer = document.getElementById('productsContainer');
-const searchInput = document.getElementById('searchInput');
-const categoryFilter = document.getElementById('categoryFilter');
-const cartCount = document.getElementById('cartCount');
-const cartList = document.getElementById('cartList');
-const totalPriceEl = document.getElementById('totalPrice');
-const clearCartBtn = document.getElementById('clearCart');
-const openCheckoutBtn = document.getElementById('openCheckout');
-const checkoutModal = document.getElementById('checkoutModal');
-const pmListEl = document.getElementById('pmList');
-const pmDetails = document.getElementById('pmDetails');
-const orderSummary = document.getElementById('orderSummary');
-const cancelCheckoutBtn = document.getElementById('cancelCheckoutBtn');
-const confirmCheckoutBtn = document.getElementById('confirmCheckoutBtn');
-const langToggle = document.getElementById('langToggle');
-const cartButton = document.getElementById('cartButton');
-const cartSidebar = document.getElementById('cartSidebar');
-
-/* =======================
-   Helpers
-   ======================= */
-function formatCurrency(n){ return '$' + Number(n).toFixed(2); }
-function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]); }
-
-/* =======================
-   Load Products from Firestore
-   ======================= */
-async function loadProducts(){
-  productsContainer.innerHTML = 'Loading products...';
-  try{
-    const snap = await db.collection('products').get();
-    PRODUCTS = [];
-    const cats = new Set();
-    snap.forEach(doc => {
-      const p = doc.data();
-      p.id = doc.id;
-      p.price = Number(p.price) || 0;
-      PRODUCTS.push(p);
-      cats.add(p.category || 'Other');
+  // Load products
+  function loadProducts(){
+    productList.innerHTML = '';
+    db.collection('products').get().then(snapshot => {
+      snapshot.forEach(doc => {
+        const product = doc.data();
+        const div = document.createElement('div');
+        div.classList.add('product');
+        div.innerHTML = `
+          ${product.imageUrl ? `<img src="${product.imageUrl}" alt="${product.name}">` : ''}
+          <h3>${product.name}</h3>
+          <p>Price: $${product.price}</p>
+          <p>${product.description}</p>
+          <button onclick="addToCart('${doc.id}', '${product.name}', ${product.price})">Add to Cart</button>
+        `;
+        productList.appendChild(div);
+      });
     });
-
-    // fill category select
-    categoryFilter.innerHTML = '<option value="">All Categories</option>' + Array.from(cats).map(c=>`<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
-    renderProducts();
-  }catch(e){
-    console.error(e);
-    productsContainer.innerHTML = '<div style="padding:12px;color:#ef4444">Failed to load products.</div>';
-  }
-}
-
-/* Render products (search + filter + sort similar names together) */
-function renderProducts(){
-  productsContainer.innerHTML = '';
-  const term = (searchInput.value||'').trim().toLowerCase();
-  const cat = categoryFilter.value || '';
-
-  const filtered = PRODUCTS
-    .filter(p=>{
-      const name = (p.name||'').toLowerCase();
-      const desc = (p.description||'').toLowerCase();
-      const matchSearch = !term || name.includes(term) || desc.includes(term);
-      const matchCat = !cat || (p.category||'') === cat;
-      return matchSearch && matchCat;
-    })
-    .sort((a,b)=> (a.name||'').localeCompare(b.name||''));
-
-  if (!filtered.length){
-    productsContainer.innerHTML = `<div style="padding:20px;color:var(--muted)">No products found.</div>`;
-    return;
   }
 
-  filtered.forEach(p=>{
-    const card = document.createElement('div');
-    card.className = 'product';
-    card.setAttribute('data-category', p.category || '');
-    const img = p.imageUrl ? `<img class="img" src="${escapeHtml(p.imageUrl)}" alt="${escapeHtml(p.name)}">` : `<div class="img" style="display:flex;align-items:center;justify-content:center;color:var(--muted)">${escapeHtml(p.name)}</div>`;
-    const inCartQty = CART[p.id]?.qty || 0;
-    card.innerHTML = `
-      ${img}
-      <div>
-        <h3>${escapeHtml(p.name)}</h3>
-        <div class="price">${formatCurrency(p.price)}</div>
-        <div class="desc">${escapeHtml(p.description||'')}</div>
-      </div>
-      <div class="controls-row">
-        <button class="add-btn">Add</button>
-        <div class="qty-badge">In cart: ${inCartQty}</div>
-      </div>
-    `;
-    card.querySelector('.add-btn').addEventListener('click', ()=> addToCart(p));
-    productsContainer.appendChild(card);
+  loadProducts();
+
+  // Add to cart
+  function addToCart(id, name, price){
+    cart.push({id, name, price});
+    renderCart();
+  }
+
+  // Render cart
+  function renderCart(){
+    cartItems.innerHTML = '';
+    cart.forEach((item) => {
+      const li = document.createElement('li');
+      li.textContent = `${item.name} - $${item.price}`;
+      cartItems.appendChild(li);
+    });
+  }
+
+  document.getElementById('checkoutBtn').addEventListener('click', () => {
+    alert('Proceeding to checkout...');
   });
-}
-
-/* =======================
-   Cart functions — aggregate quantities (no duplicate names)
-   ======================= */
-function addToCart(product){
-  if (!CART[product.id]) CART[product.id] = { product, qty: 0 };
-  CART[product.id].qty += 1;
-  updateCartUI();
-  renderProducts(); // update in-cart badges
-}
-
-function incQty(productId){ if (CART[productId]) { CART[productId].qty++; updateCartUI(); renderProducts(); } }
-function decQty(productId){ if (CART[productId]) { CART[productId].qty--; if (CART[productId].qty<=0) delete CART[productId]; updateCartUI(); renderProducts(); } }
-function removeItem(productId){ if (CART[productId]) { delete CART[productId]; updateCartUI(); renderProducts(); } }
-
-function updateCartUI(){
-  cartList.innerHTML = '';
-  const items = Object.values(CART);
-  if (items.length === 0){ cartList.innerHTML = `<li style="color:var(--muted)">Cart is empty</li>`; cartCount.textContent = '0'; totalPriceEl.textContent = 'Total: $0.00'; return; }
-  let total = 0;
-  items.forEach(({product, qty})=>{
-    total += product.price * qty;
-    const li = document.createElement('li');
-    li.className = 'cart-item';
-    li.innerHTML = `
-      <div class="left">
-        <div class="title">${escapeHtml(product.name)}</div>
-        <div class="meta">${formatCurrency(product.price)} × ${qty}</div>
-      </div>
-      <div class="cart-controls">
-        <button class="icon-btn dec">−</button>
-        <div style="min-width:26px;text-align:center;font-weight:700">${qty}</div>
-        <button class="icon-btn inc">+</button>
-        <button class="icon-btn remove" title="Remove">🗑</button>
-      </div>
-    `;
-    li.querySelector('.inc').addEventListener('click', ()=> incQty(product.id));
-    li.querySelector('.dec').addEventListener('click', ()=> decQty(product.id));
-    li.querySelector('.remove').addEventListener('click', ()=> removeItem(product.id));
-    cartList.appendChild(li);
-  });
-  cartCount.textContent = items.reduce((s,i)=>s+i.qty,0);
-  totalPriceEl.textContent = `Total: ${formatCurrency(total)}`;
-}
-
-/* clear cart */
-document.getElementById('clearCart').addEventListener('click', ()=> { CART = {}; updateCartUI(); renderProducts(); });
-
-/* search & filter events */
-searchInput.addEventListener('input', ()=> renderProducts());
-categoryFilter.addEventListener('change', ()=> renderProducts());
-
-/* show checkout modal */
-document.getElementById('openCheckout').addEventListener('click', ()=>{
-  const items = Object.values(CART);
-  if (!items.length){ alert('Cart is empty'); return; }
-  // order summary
-  let html = '';
-  let total = 0;
-  items.forEach(({product, qty})=>{
-    html += `${escapeHtml(product.name)} x${qty} — ${formatCurrency(product.price * qty)}<br/>`;
-    total += product.price * qty;
-  });
-  html += `<hr><div style="font-weight:700;margin-top:6px">Total: ${formatCurrency(total)}</div>`;
-  orderSummary.innerHTML = html;
-  // default payment
-  pmListEl.querySelectorAll('.pm-item').forEach(el=> el.classList.toggle('active', el.dataset.method === 'cash'));
-  selectedPayment = 'cash';
-  renderPmDetails('cash');
-  checkoutModal.style.display = 'flex';
-  checkoutModal.setAttribute('aria-hidden','false');
-});
-
-/* payment method selection */
-pmListEl.addEventListener('click', (e)=> {
-  const el = e.target.closest('.pm-item');
-  if(!el) return;
-  const method = el.dataset.method;
-  pmListEl.querySelectorAll('.pm-item').forEach(it => it.classList.toggle('active', it===el));
-  selectedPayment = method;
-  renderPmDetails(method);
-});
-
-function renderPmDetails(method){
-  pmDetails.innerHTML = '';
-  if (method === 'cash'){
-    pmDetails.innerHTML = `<div style="color:var(--muted)">Pay cash to courier upon delivery.</div>`;
-  } else if (method === 'bank'){
-    pmDetails.innerHTML = `
-      <label>Bank Name<input id="bankName" style="width:100%;padding:8px;margin-top:6px;border-radius:8px;border:1px solid #eef6ff"></label>
-      <label>Account Number<input id="bankAccount" style="width:100%;padding:8px;margin-top:6px;border-radius:8px;border:1px solid #eef6ff"></label>
-    `;
-  } else if (method === 'stcpay'){
-    pmDetails.innerHTML = `<label>STC Pay Number<input id="stcPhone" placeholder="+9665..." style="width:100%;padding:8px;margin-top:6px;border-radius:8px;border:1px solid #eef6ff"></label>`;
-  } else if (method === 'paypal'){
-    pmDetails.innerHTML = `<label>PayPal Email<input id="paypalEmail" type="email" style="width:100%;padding:8px;margin-top:6px;border-radius:8px;border:1px solid #eef6ff"></label>`;
-  } else if (method === 'card'){
-    pmDetails.innerHTML = `
-      <label>Card Number<input id="cardNumber" placeholder="1234 5678 9012 3456" style="width:100%;padding:8px;margin-top:6px;border-radius:8px;border:1px solid #eef6ff"></label>
-      <div style="display:flex; gap:8px; margin-top:8px;">
-        <input id="cardExpiry" type="month" style="flex:1;padding:8px;border-radius:8px;border:1px solid #eef6ff">
-        <input id="cardCVC" placeholder="CVC" style="width:110px;padding:8px;border-radius:8px;border:1px solid #eef6ff">
-      </div>
-    `;
-  }
-}
-
-/* cancel checkout */
-cancelCheckoutBtn.addEventListener('click', ()=> {
-  checkoutModal.style.display = 'none';
-  checkoutModal.setAttribute('aria-hidden','true');
-});
-
-/* confirm checkout -> validate, save to Firestore, send invoice via EmailJS if configured */
-confirmCheckoutBtn.addEventListener('click', async ()=>{
-  const items = Object.values(CART);
-  if (!items.length){ alert('Cart empty'); return; }
-
-  const payment = { method: selectedPayment };
-  // validate payment-specific fields
-  if (selectedPayment === 'bank'){
-    const bank = document.getElementById('bankAccount')?.value?.trim() || '';
-    const bankName = document.getElementById('bankName')?.value?.trim() || '';
-    if (!bank || !bankName) { alert('Please fill bank details'); return; }
-    payment.bankName = bankName; payment.bank = bank;
-  } else if (selectedPayment === 'stcpay'){
-    const stc = document.getElementById('stcPhone')?.value?.trim() || '';
-    if (!stc) { alert('Please enter STC Pay number'); return; }
-    payment.stc = stc;
-  } else if (selectedPayment === 'paypal'){
-    const email = document.getElementById('paypalEmail')?.value?.trim() || '';
-    if (!email) { alert('Please enter PayPal email'); return; }
-    payment.paypal = email;
-  } else if (selectedPayment === 'card'){
-    const card = document.getElementById('cardNumber')?.value?.trim() || '';
-    const exp = document.getElementById('cardExpiry')?.value?.trim() || '';
-    const cvc = document.getElementById('cardCVC')?.value?.trim() || '';
-    if (!card || !exp || !cvc) { alert('Please fill card details'); return; }
-    payment.card = { card, exp, cvc };
-    // NOTE: For production, integrate a proper payment gateway (Stripe/PayPal) — do NOT collect raw card data in client in real apps.
-  }
-
-  // build order
-  const orderItems = items.map(({product, qty}) => ({ id: product.id, name: product.name, price: product.price, qty }));
-  const total = orderItems.reduce((s,i)=> s + i.price * i.qty, 0);
-  const order = { createdAt: new Date(), items: orderItems, total, payment, status: 'pending' };
-
-  try{
-    const docRef = await db.collection('orders').add(order);
-    const orderId = docRef.id;
-
-    // create invoice text
-    let invoice = `Order ID: ${orderId}\n\nItems:\n`;
-    orderItems.forEach(it => invoice += `${it.name} x${it.qty} = ${formatCurrency(it.price * it.qty)}\n`);
-    invoice += `\nTotal: ${formatCurrency(total)}\nPayment method: ${selectedPayment}\n\nThank you!`;
-
-    // If EmailJS configured, send invoice email
-    if (typeof emailjs !== 'undefined' && EMAILJS_USER_ID && EMAILJS_SERVICE_ID && EMAILJS_TEMPLATE_ID && EMAILJS_USER_ID !== 'REPLACE_WITH_EMAILJS_USERID') {
-      const toEmail = prompt('Enter email to send invoice to (for demo):');
-      if (toEmail && /\S+@\S+\.\S+/.test(toEmail)) {
-        const templateParams = { to_email: toEmail, order_id: orderId, message: invoice, total: total.toFixed(2) };
-        try{
-          await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams);
-          alert('Order saved and invoice sent by email!');
-        }catch(e){
-          console.warn('Email send failed', e);
-          alert('Order saved (email send failed). Order ID: ' + orderId);
-        }
-      } else {
-        alert('Order saved. Order ID: ' + orderId);
-      }
-    } else {
-      alert('Order saved. Order ID: ' + orderId + '\n(Email sending not configured)');
-    }
-
-    CART = {}; updateCartUI(); renderProducts(); checkoutModal.style.display='none';
-  }catch(err){
-    console.error(err);
-    alert('Failed to save order: ' + (err.message || err));
-  }
-});
-
-/* toggle language (only affects some labels and placeholder; data remains) */
-langToggle.addEventListener('click', ()=> {
-  if (currentLang === 'en') { currentLang = 'ar'; langToggle.textContent = 'EN'; document.documentElement.dir = 'rtl'; }
-  else { currentLang = 'en'; langToggle.textContent = 'عربي'; document.documentElement.dir = 'ltr'; }
-  // re-render for any placeholder changes
-  renderProducts();
-});
-
-/* open cart button scrolls to sidebar in small screens */
-document.getElementById('cartButton').addEventListener('click', ()=> {
-  cartSidebar.scrollIntoView({behavior:'smooth', block:'center'});
-});
-
-/* Initial load */
-loadProducts();
-updateCartUI();
-
 </script>
 </body>
 </html>
