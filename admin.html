@@ -1,105 +1,135 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>BAGANIZA Store (Nidal Abu Samra)</title>
+<title>لوحة إدارة المنتجات</title>
 <style>
-  body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f9f9f9; }
-  header { background-color: #333; color: white; padding: 10px; text-align: center; }
-  header h1 { margin: 0; font-size: 24px; }
-  header small { font-size: 14px; color: gold; display: block; }
-  .container { display: flex; flex-wrap: wrap; justify-content: center; padding: 10px; }
-  .product { border: 1px solid #ddd; margin: 10px; padding: 10px; width: 220px; background: white; border-radius: 5px; text-align: center; }
-  .product img { max-width: 100%; height: auto; margin-bottom: 10px; border-radius: 5px; }
-  .product h3 { margin: 0 0 10px; font-size: 18px; }
-  .product p { margin: 5px 0; }
-  .cart { position: fixed; top: 10px; right: 10px; background: white; border: 1px solid #ddd; padding: 10px; width: 250px; border-radius: 5px; }
-  .cart h2 { margin-top: 0; }
-  button { padding: 5px 10px; margin-top: 5px; cursor: pointer; }
-  @media (max-width: 600px) {
-    .container { flex-direction: column; align-items: center; }
-    .product { width: 90%; }
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #f8f4f0;
+    margin: 0;
+    padding: 20px;
+  }
+  h1 {
+    color: #ff6f61;
+  }
+  label {
+    display: block;
+    margin-top: 10px;
+  }
+  input, textarea, button {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+  button {
+    background: #ff6f61;
+    color: white;
+    border: none;
+    cursor: pointer;
+    margin-top: 15px;
+  }
+  progress {
+    width: 100%;
+    height: 20px;
+    margin-top: 10px;
   }
 </style>
 </head>
 <body>
 
-<header>
-  <h1>BAGANIZA STORE</h1>
-  <small>(Nidal Abu Samra)</small>
-</header>
+<h1>إضافة منتج جديد</h1>
+<label>اسم المنتج</label>
+<input type="text" id="productName">
 
-<div class="container" id="productList"></div>
+<label>الوصف</label>
+<textarea id="productDesc"></textarea>
 
-<div class="cart" id="cart">
-  <h2>Shopping Cart</h2>
-  <ul id="cartItems"></ul>
-  <button id="checkoutBtn">Checkout</button>
-</div>
+<label>السعر</label>
+<input type="number" id="productPrice">
+
+<label>صورة المنتج (اختياري)</label>
+<input type="file" id="productImage" accept="image/*">
+
+<progress id="uploadProgress" value="0" max="100" style="display:none;"></progress>
+
+<button id="addProductBtn">إضافة المنتج</button>
 
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
 
 <script>
-  // Firebase config
   const firebaseConfig = {
-    apiKey: "AIzaSyCcWgFDzs95TbVU7v5h_5O0lNzZvBlL90o",
-    authDomain: "baganiza-66bf0.firebaseapp.com",
-    projectId: "baganiza-66bf0",
-    storageBucket: "baganiza-66bf0.appspot.com",
-    messagingSenderId: "1016966032123",
-    appId: "1:1016966032123:web:fbffd397c7d8494fa79e5e"
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_AUTH_DOMAIN",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_BUCKET",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
   };
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
+  const storage = firebase.storage();
 
-  const productList = document.getElementById('productList');
-  const cartItems = document.getElementById('cartItems');
-  let cart = [];
+  const addProductBtn = document.getElementById('addProductBtn');
+  const uploadProgress = document.getElementById('uploadProgress');
 
-  // Load products
-  function loadProducts(){
-    productList.innerHTML = '';
-    db.collection('products').get().then(snapshot => {
-      snapshot.forEach(doc => {
-        const product = doc.data();
-        const div = document.createElement('div');
-        div.classList.add('product');
-        div.innerHTML = `
-          ${product.imageUrl ? `<img src="${product.imageUrl}" alt="${product.name}">` : ''}
-          <h3>${product.name}</h3>
-          <p>Price: $${product.price}</p>
-          <p>${product.description}</p>
-          <button onclick="addToCart('${doc.id}', '${product.name}', ${product.price})">Add to Cart</button>
-        `;
-        productList.appendChild(div);
-      });
+  addProductBtn.onclick = () => {
+    const name = document.getElementById('productName').value.trim();
+    const desc = document.getElementById('productDesc').value.trim();
+    const price = parseFloat(document.getElementById('productPrice').value);
+    const file = document.getElementById('productImage').files[0];
+
+    if (!name || !desc || isNaN(price)) {
+      alert('يرجى إدخال جميع البيانات المطلوبة');
+      return;
+    }
+
+    if (file) {
+      const storageRef = storage.ref('products/' + Date.now() + '_' + file.name);
+      const uploadTask = storageRef.put(file);
+
+      uploadProgress.style.display = 'block';
+
+      uploadTask.on('state_changed',
+        (snapshot) => {
+          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          uploadProgress.value = progress;
+        },
+        (error) => {
+          console.error('فشل رفع الصورة:', error);
+          saveProduct(name, desc, price, null);
+        },
+        () => {
+          uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+            saveProduct(name, desc, price, downloadURL);
+          });
+        }
+      );
+
+    } else {
+      saveProduct(name, desc, price, null);
+    }
+  };
+
+  function saveProduct(name, desc, price, imageUrl) {
+    db.collection('products').add({
+      name: name,
+      description: desc,
+      price: price,
+      imageUrl: imageUrl || ''
+    }).then(() => {
+      alert('تمت إضافة المنتج بنجاح');
+      location.reload();
+    }).catch((err) => {
+      console.error('خطأ في إضافة المنتج:', err);
     });
   }
-
-  loadProducts();
-
-  // Add to cart
-  function addToCart(id, name, price){
-    cart.push({id, name, price});
-    renderCart();
-  }
-
-  // Render cart
-  function renderCart(){
-    cartItems.innerHTML = '';
-    cart.forEach((item) => {
-      const li = document.createElement('li');
-      li.textContent = `${item.name} - $${item.price}`;
-      cartItems.appendChild(li);
-    });
-  }
-
-  document.getElementById('checkoutBtn').addEventListener('click', () => {
-    alert('Proceeding to checkout...');
-  });
 </script>
 </body>
 </html>
