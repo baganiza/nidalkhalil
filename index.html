@@ -19,8 +19,9 @@
       justify-content: space-between;
       align-items: center;
       box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      flex-wrap: wrap;
     }
-    header h1 { margin: 0; font-size: 26px; font-weight: bold; }
+    header h1 { margin: 0; font-size: 24px; font-weight: bold; }
     header h1 small { font-size: 14px; color: #f1c40f; margin-left: 6px; }
     #cart { position: relative; background: white; color: #333;
       padding: 8px 18px; border-radius: 20px; cursor: pointer;
@@ -30,6 +31,10 @@
       padding: 10px; border-radius: 10px; box-shadow: 0 3px 10px rgba(0,0,0,0.2); z-index: 100; }
     #cartItems ul { list-style: none; margin: 0; padding: 0; }
     #cartItems li { margin: 6px 0; font-size: 15px; }
+    #filters { background: #fff; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+    #filters select, #filters input {
+      padding: 8px; border-radius: 6px; border: 1px solid #ccc; font-size: 14px;
+    }
     #productsContainer { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
       gap: 20px; padding: 20px; }
     .product { background: white; padding: 15px; border-radius: 12px;
@@ -74,6 +79,17 @@
     </div>
   </header>
 
+  <!-- Filters -->
+  <section id="filters">
+    <input type="text" id="searchBox" placeholder="🔍 Search products...">
+    <select id="categoryFilter">
+      <option value="All">All Categories</option>
+      <option value="Electronics">Electronics</option>
+      <option value="Clothes">Clothes</option>
+      <option value="Food">Food</option>
+    </select>
+  </section>
+
   <main id="productsContainer"></main>
 
   <!-- Payment Modal -->
@@ -116,38 +132,47 @@
     const paymentModal = document.getElementById("paymentModal");
     const modalContent = document.getElementById("modalContent");
 
+    let allProducts = [];
+
     function loadProducts() {
       db.collection("products").get().then(snapshot => {
-        productsContainer.innerHTML = "";
+        allProducts = [];
         snapshot.forEach(doc => {
-          const product = doc.data();
-          const productDiv = document.createElement("div");
-          productDiv.className = "product";
-
-          const img = document.createElement("img");
-          img.src = product.imageUrl ? product.imageUrl : "https://via.placeholder.com/120";
-
-          const name = document.createElement("h3");
-          name.textContent = product.name;
-
-          const desc = document.createElement("p");
-          desc.textContent = product.description;
-
-          const price = document.createElement("p");
-          price.innerHTML = `<strong>$${product.price}</strong>`;
-
-          const btn = document.createElement("button");
-          btn.textContent = "Add to Cart";
-          btn.onclick = () => addToCart(doc.id, product);
-
-          productDiv.appendChild(img);
-          productDiv.appendChild(name);
-          productDiv.appendChild(desc);
-          productDiv.appendChild(price);
-          productDiv.appendChild(btn);
-
-          productsContainer.appendChild(productDiv);
+          allProducts.push({ id: doc.id, ...doc.data() });
         });
+        renderProducts(allProducts);
+      });
+    }
+
+    function renderProducts(products) {
+      productsContainer.innerHTML = "";
+      products.forEach(product => {
+        const productDiv = document.createElement("div");
+        productDiv.className = "product";
+
+        const img = document.createElement("img");
+        img.src = product.imageUrl ? product.imageUrl : "https://via.placeholder.com/120";
+
+        const name = document.createElement("h3");
+        name.textContent = product.name;
+
+        const desc = document.createElement("p");
+        desc.textContent = product.description;
+
+        const price = document.createElement("p");
+        price.innerHTML = `<strong>$${product.price}</strong>`;
+
+        const btn = document.createElement("button");
+        btn.textContent = "Add to Cart";
+        btn.onclick = () => addToCart(product.id, product);
+
+        productDiv.appendChild(img);
+        productDiv.appendChild(name);
+        productDiv.appendChild(desc);
+        productDiv.appendChild(price);
+        productDiv.appendChild(btn);
+
+        productsContainer.appendChild(productDiv);
       });
     }
 
@@ -214,6 +239,21 @@
     function confirmPayment(method) {
       alert("Payment confirmed with " + method);
       closeModal();
+    }
+
+    // 🔎 Search + Filter
+    document.getElementById("searchBox").addEventListener("input", filterProducts);
+    document.getElementById("categoryFilter").addEventListener("change", filterProducts);
+
+    function filterProducts() {
+      const searchValue = document.getElementById("searchBox").value.toLowerCase();
+      const categoryValue = document.getElementById("categoryFilter").value;
+      const filtered = allProducts.filter(p => {
+        const matchesSearch = p.name.toLowerCase().includes(searchValue) || p.description.toLowerCase().includes(searchValue);
+        const matchesCategory = (categoryValue === "All") || (p.category && p.category === categoryValue);
+        return matchesSearch && matchesCategory;
+      });
+      renderProducts(filtered);
     }
 
     loadProducts();
