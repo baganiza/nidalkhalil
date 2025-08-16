@@ -1,71 +1,41 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BAGANIZA STORE (Nidal Abu Samra)</title>
   <style>
-    body {
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      margin: 0; padding: 0;
-      background: #f5f7fa;
-      color: #333;
-    }
-    header {
-      background: linear-gradient(90deg, #1e3c72, #2a5298);
-      color: white;
-      padding: 15px 30px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-      flex-wrap: wrap;
-    }
-    header h1 { margin: 0; font-size: 24px; font-weight: bold; }
-    header h1 small { font-size: 14px; color: #f1c40f; margin-left: 6px; }
-    #cart { position: relative; background: white; color: #333;
-      padding: 8px 18px; border-radius: 20px; cursor: pointer;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.3); font-weight: bold; }
-    #cartItems { display: none; position: absolute; right: 0; top: 50px;
-      background: white; border: 1px solid #ccc; width: 300px;
-      padding: 10px; border-radius: 10px; box-shadow: 0 3px 10px rgba(0,0,0,0.2); z-index: 100; }
-    #cartItems ul { list-style: none; margin: 0; padding: 0; }
-    #cartItems li { margin: 6px 0; font-size: 15px; }
-    #filters { background: #fff; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
-    #filters select, #filters input {
-      padding: 8px; border-radius: 6px; border: 1px solid #ccc; font-size: 14px;
-    }
-    #productsContainer { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 20px; padding: 20px; }
-    .product { background: white; padding: 15px; border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: flex;
-      flex-direction: column; align-items: center; text-align: center; transition: transform 0.2s; }
-    .product:hover { transform: translateY(-5px); }
-    .product img { width: 120px; height: 120px; object-fit: cover; border-radius: 10px; margin-bottom: 10px; }
-    .product h3 { margin: 5px 0; font-size: 18px; }
-    .product p { font-size: 14px; color: #666; }
-    .product button { background: #2a5298; color: white; border: none; padding: 8px 14px;
-      border-radius: 6px; cursor: pointer; margin-top: auto; }
-    .product button:hover { background: #1e3c72; }
-    #checkoutBtn { background: #27ae60; color: white; border: none; padding: 8px 14px;
-      border-radius: 6px; margin-top: 10px; cursor: pointer; }
-    #checkoutBtn:hover { background: #1e8449; }
-    /* Modal */
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 200; }
-    .modal-content { background: white; padding: 20px; border-radius: 12px;
-      text-align: center; width: 320px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
-    .modal-content h2 { margin-top: 0; font-size: 20px; }
-    .modal-content button { display: block; width: 100%; margin: 8px 0; padding: 10px;
-      border: none; border-radius: 8px; cursor: pointer; font-size: 15px; font-weight: bold;
-      transition: background 0.2s; }
-    .btn-cash { background: #27ae60; color: white; }
-    .btn-stc { background: #8e44ad; color: white; }
-    .btn-paypal { background: #3498db; color: white; }
-    .btn-card { background: #e67e22; color: white; }
-    .modal-content button:hover { opacity: 0.85; }
-    input { width: 90%; padding: 8px; margin: 5px 0; border: 1px solid #ccc; border-radius: 6px; }
-    footer { background: #1e3c72; color: white; text-align: center; padding: 12px; font-size: 14px; margin-top: 20px; }
+    body { font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; margin:0; background:#f5f7fa; color:#333; }
+    header { background: linear-gradient(90deg,#1e3c72,#2a5298); color:white; padding:15px 30px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; box-shadow:0 2px 8px rgba(0,0,0,0.2); }
+    header h1 { margin:0; font-size:24px; font-weight:bold; }
+    header h1 small { font-size:14px; color:#f1c40f; margin-left:6px; }
+    #cart { position:relative; background:white; color:#333; padding:8px 18px; border-radius:20px; cursor:pointer; box-shadow:0 2px 5px rgba(0,0,0,0.3); font-weight:bold; }
+    #cartItems { display:none; position:absolute; right:0; top:50px; background:white; border:1px solid #ccc; width:340px; padding:10px; border-radius:10px; box-shadow:0 3px 10px rgba(0,0,0,0.2); z-index:100; }
+    #cartItems ul { list-style:none; margin:0; padding:0; }
+    #cartItems li { margin:6px 0; font-size:14px; display:flex; justify-content:space-between; align-items:center; gap:6px; }
+    .remove-btn { background:red; color:white; border:none; padding:3px 6px; border-radius:6px; cursor:pointer; font-size:12px; }
+    #cartTotal { font-weight:bold; margin-top:10px; }
+    #filters { background:#fff; padding:10px 20px; display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; }
+    #filters select,#filters input { padding:8px; border-radius:6px; border:1px solid #ccc; font-size:14px; }
+    #productsContainer { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:20px; padding:20px; }
+    .product { background:white; padding:15px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.1); text-align:center; transition:transform 0.2s; }
+    .product:hover { transform:translateY(-5px); }
+    .product img { width:120px; height:120px; object-fit:cover; border-radius:10px; margin-bottom:10px; }
+    .product h3 { margin:5px 0; font-size:18px; }
+    .product p { font-size:14px; color:#666; }
+    .product button { background:#2a5298; color:white; border:none; padding:8px 14px; border-radius:6px; cursor:pointer; margin-top:auto; }
+    .product button:hover { background:#1e3c72; }
+    #checkoutBtn { background:#27ae60; color:white; border:none; padding:8px 14px; border-radius:6px; margin-top:10px; cursor:pointer; }
+    #checkoutBtn:hover { background:#1e8449; }
+    .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:200; }
+    .modal-content { background:white; padding:20px; border-radius:12px; text-align:center; width:320px; box-shadow:0 2px 10px rgba(0,0,0,0.3); }
+    .modal-content h2 { margin-top:0; font-size:20px; }
+    .modal-content button { display:block; width:100%; margin:8px 0; padding:10px; border:none; border-radius:8px; cursor:pointer; font-size:15px; font-weight:bold; }
+    .btn-cash { background:#27ae60; color:white; }
+    .btn-stc { background:#8e44ad; color:white; }
+    .btn-paypal { background:#3498db; color:white; }
+    .btn-card { background:#e67e22; color:white; }
+    footer { background:#1e3c72; color:white; text-align:center; padding:12px; font-size:14px; margin-top:20px; }
   </style>
 </head>
 <body>
@@ -74,6 +44,7 @@
     <div id="cart">🛒 (<span id="cartCount">0</span>)
       <div id="cartItems">
         <ul id="cartList"></ul>
+        <p id="cartTotal">Total: 0 ريال</p>
         <button id="checkoutBtn">Checkout</button>
       </div>
     </div>
@@ -81,12 +52,12 @@
 
   <!-- Filters -->
   <section id="filters">
-    <input type="text" id="searchBox" placeholder="🔍 Search products...">
+    <input type="text" id="searchBox" placeholder="🔍 ابحث عن منتج...">
     <select id="categoryFilter">
-      <option value="All">All Categories</option>
-      <option value="Electronics">Electronics</option>
-      <option value="Clothes">Clothes</option>
-      <option value="Food">Food</option>
+      <option value="All">كل التصنيفات</option>
+      <option value="Electronics">إلكترونيات</option>
+      <option value="Clothes">ملابس</option>
+      <option value="Food">أطعمة</option>
     </select>
   </section>
 
@@ -95,17 +66,17 @@
   <!-- Payment Modal -->
   <div class="modal" id="paymentModal">
     <div class="modal-content" id="modalContent">
-      <h2>Select Payment Method</h2>
-      <button class="btn-cash" onclick="selectMethod('Cash')">💵 Cash</button>
+      <h2>اختر طريقة الدفع</h2>
+      <button class="btn-cash" onclick="selectMethod('Cash')">💵 كاش</button>
       <button class="btn-stc" onclick="selectMethod('STC Pay')">📱 STC Pay</button>
       <button class="btn-paypal" onclick="selectMethod('PayPal')">💳 PayPal</button>
-      <button class="btn-card" onclick="selectMethod('Card')">💳 Credit Card</button>
+      <button class="btn-card" onclick="selectMethod('Card')">💳 بطاقة بنكية</button>
       <br>
-      <button onclick="closeModal()">Cancel</button>
+      <button onclick="closeModal()">إلغاء</button>
     </div>
   </div>
 
-  <footer>All Rights Reserved for Nidal Abu Samra 2025</footer>
+  <footer>جميع الحقوق محفوظة © نضال أبو سمرة 2025</footer>
 
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
@@ -131,6 +102,7 @@
     const checkoutBtn = document.getElementById("checkoutBtn");
     const paymentModal = document.getElementById("paymentModal");
     const modalContent = document.getElementById("modalContent");
+    const cartTotal = document.getElementById("cartTotal");
 
     let allProducts = [];
 
@@ -160,10 +132,10 @@
         desc.textContent = product.description;
 
         const price = document.createElement("p");
-        price.innerHTML = `<strong>$${product.price}</strong>`;
+        price.innerHTML = `<strong>${product.price} ريال</strong>`;
 
         const btn = document.createElement("button");
-        btn.textContent = "Add to Cart";
+        btn.textContent = "أضف إلى السلة";
         btn.onclick = () => addToCart(product.id, product);
 
         productDiv.appendChild(img);
@@ -182,16 +154,34 @@
       updateCart();
     }
 
+    function removeFromCart(id) {
+      delete cart[id];
+      updateCart();
+    }
+
     function updateCart() {
       cartList.innerHTML = "";
-      let count = 0;
+      let count = 0, total = 0;
       for(let id in cart) {
         const li = document.createElement("li");
-        li.textContent = `${cart[id].name} x ${cart[id].quantity}`;
+        const item = cart[id];
+        const span = document.createElement("span");
+        span.textContent = `${item.name} x ${item.quantity} = ${item.price * item.quantity} ريال`;
+
+        const removeBtn = document.createElement("button");
+        removeBtn.textContent = "❌";
+        removeBtn.className = "remove-btn";
+        removeBtn.onclick = () => removeFromCart(id);
+
+        li.appendChild(span);
+        li.appendChild(removeBtn);
         cartList.appendChild(li);
-        count += cart[id].quantity;
+
+        count += item.quantity;
+        total += item.price * item.quantity;
       }
       cartCount.textContent = count;
+      cartTotal.textContent = `الإجمالي: ${total} ريال`;
     }
 
     document.getElementById("cart").addEventListener("click", () => {
@@ -205,54 +195,48 @@
     function closeModal() {
       paymentModal.style.display = "none";
       modalContent.innerHTML = `
-        <h2>Select Payment Method</h2>
-        <button class="btn-cash" onclick="selectMethod('Cash')">💵 Cash</button>
+        <h2>اختر طريقة الدفع</h2>
+        <button class="btn-cash" onclick="selectMethod('Cash')">💵 كاش</button>
         <button class="btn-stc" onclick="selectMethod('STC Pay')">📱 STC Pay</button>
         <button class="btn-paypal" onclick="selectMethod('PayPal')">💳 PayPal</button>
-        <button class="btn-card" onclick="selectMethod('Card')">💳 Credit Card</button>
-        <br><button onclick="closeModal()">Cancel</button>`;
+        <button class="btn-card" onclick="selectMethod('Card')">💳 بطاقة بنكية</button>
+        <br><button onclick="closeModal()">إلغاء</button>`;
     }
 
     function selectMethod(method) {
       if(method === "Cash") {
-        modalContent.innerHTML = `<h2>Cash Payment</h2><p>💵 You will pay on delivery.</p><button onclick="closeModal()">OK</button>`;
+        modalContent.innerHTML = `<h2>الدفع كاش</h2><p>💵 ستقوم بالدفع عند الاستلام.</p><button onclick="closeModal()">تم</button>`;
       }
       if(method === "STC Pay") {
-        modalContent.innerHTML = `<h2>STC Pay</h2>
-          <input type="text" placeholder="Enter Mobile Number">
-          <button onclick="confirmPayment('STC Pay')">Confirm</button>`;
+        modalContent.innerHTML = `<h2>STC Pay</h2><input type="text" placeholder="أدخل رقم الجوال"><button onclick="confirmPayment('STC Pay')">تأكيد</button>`;
       }
       if(method === "PayPal") {
-        modalContent.innerHTML = `<h2>PayPal</h2>
-          <input type="email" placeholder="Enter PayPal Email">
-          <button onclick="confirmPayment('PayPal')">Confirm</button>`;
+        modalContent.innerHTML = `<h2>PayPal</h2><input type="email" placeholder="أدخل بريد PayPal"><button onclick="confirmPayment('PayPal')">تأكيد</button>`;
       }
       if(method === "Card") {
-        modalContent.innerHTML = `<h2>Credit Card</h2>
-          <input type="text" placeholder="Card Number">
-          <input type="text" placeholder="MM/YY">
-          <input type="text" placeholder="CVV">
-          <button onclick="confirmPayment('Card')">Confirm</button>`;
+        modalContent.innerHTML = `<h2>بطاقة بنكية</h2><input type="text" placeholder="رقم البطاقة"><input type="text" placeholder="MM/YY"><input type="text" placeholder="CVV"><button onclick="confirmPayment('Card')">تأكيد</button>`;
       }
     }
 
     function confirmPayment(method) {
-      alert("Payment confirmed with " + method);
+      alert("تم الدفع عبر " + method);
       closeModal();
     }
 
-    // 🔎 Search + Filter
+    // 🔎 البحث + التصنيف
     document.getElementById("searchBox").addEventListener("input", filterProducts);
     document.getElementById("categoryFilter").addEventListener("change", filterProducts);
 
     function filterProducts() {
       const searchValue = document.getElementById("searchBox").value.toLowerCase();
       const categoryValue = document.getElementById("categoryFilter").value;
+
       const filtered = allProducts.filter(p => {
-        const matchesSearch = p.name.toLowerCase().includes(searchValue) || p.description.toLowerCase().includes(searchValue);
         const matchesCategory = (categoryValue === "All") || (p.category && p.category === categoryValue);
-        return matchesSearch && matchesCategory;
+        const matchesSearch = p.name.toLowerCase().includes(searchValue) || p.description.toLowerCase().includes(searchValue);
+        return matchesCategory && matchesSearch;
       });
+
       renderProducts(filtered);
     }
 
