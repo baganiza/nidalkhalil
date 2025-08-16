@@ -1,305 +1,452 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>BAGANIZA STORE</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Bootstrap -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- خط تجوال -->
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;600;700&display=swap" rel="stylesheet">
 
   <style>
-    body {
-      font-family: 'Tajawal', sans-serif;
-      background: #f4f7fb;
+    :root{
+      --brand:#1f3b73;
+      --brand-2:#274a8a;
+      --accent:#22c55e;
+      --card:#ffffff;
+      --bg:#edf2f7;
+      --text:#222;
+      --muted:#6b7280;
+      --gold:#f4d35e;
     }
-    header {
-      background: #1e3c72;
-      color: white;
-      padding: 15px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:'Tajawal',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:var(--bg);
+      color:var(--text);
     }
-    header h1 {
-      font-size: 24px;
-      font-weight: bold;
+
+    /* ====== Header (LTR to keep cart at visual right) ====== */
+    header{
+      direction:ltr; /* حتى يظل اللوغو يساراً والعربة يميناً */
+      background:linear-gradient(135deg,var(--brand),var(--brand-2));
+      color:#fff;
+      padding:14px 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      position:sticky; top:0; z-index:1000;
+      box-shadow:0 6px 18px rgba(0,0,0,.12);
     }
-    header h1 span {
-      font-size: 14px;
-      color: gold;
+    .brand{
+      font-size:22px; font-weight:700; letter-spacing:.5px;
     }
-    .product-card {
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      padding: 10px;
-      background: white;
-      text-align: center;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    .brand .sub{
+      font-size:12px; font-weight:700; margin-inline-start:10px;
+      color:var(--gold); text-shadow:0 0 6px rgba(244,211,94,.8);
     }
-    .product-card img {
-      max-width: 100%;
-      height: 150px;
-      object-fit: contain;
+    .actions{
+      display:flex; align-items:center; gap:10px; position:relative;
     }
-    .cart-icon {
-      cursor: pointer;
-      position: relative;
+    .cart-btn{
+      position:relative; cursor:pointer;
+      background:#fff; color:var(--brand);
+      border:none; border-radius:999px; padding:8px 12px; font-weight:700;
+      display:flex; align-items:center; gap:8px;
+      box-shadow:0 2px 10px rgba(0,0,0,.15);
     }
-    .cart-count {
-      position: absolute;
-      top: -5px;
-      right: -10px;
-      background: red;
-      color: white;
-      border-radius: 50%;
-      font-size: 12px;
-      padding: 2px 6px;
+    .cart-btn .count{
+      background:#ef4444; color:#fff; border-radius:999px; padding:2px 6px; font-size:12px; min-width:20px; text-align:center;
     }
-    .cart-dropdown {
-      position: absolute;
-      top: 50px;
-      left: 0;
-      background: white;
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      padding: 15px;
-      width: 300px;
-      display: none;
-      z-index: 1000;
+    .cart-menu{
+      position:absolute; right:0; top:calc(100% + 8px);
+      width:340px; max-height:70vh; overflow:auto;
+      background:#fff; border-radius:12px; box-shadow:0 18px 40px rgba(0,0,0,.2);
+      padding:12px; display:none; z-index:1001;
     }
-    .cart-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
+    .cart-item{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px; padding:8px 0; border-bottom:1px dashed #e5e7eb;
+      font-size:14px;
     }
-    .cart-item button {
-      border: none;
-      background: none;
-      color: red;
-      font-size: 18px;
+    .cart-item .name{flex:1}
+    .cart-item .remove{
+      border:none; background:transparent; color:#ef4444; font-size:18px; cursor:pointer;
     }
-    .checkout-modal .modal-header {
-      background: #1e3c72;
-      color: white;
+    .cart-total{
+      margin-top:8px; font-weight:700; text-align:center; background:#fff3f3; color:#b91c1c; padding:8px; border-radius:8px;
     }
+    .checkout-btn{
+      margin-top:10px; width:100%; padding:10px; border:none; border-radius:10px; font-weight:700;
+      background:var(--accent); color:#fff; cursor:pointer;
+    }
+
+    /* ====== Toolbar ====== */
+    .toolbar{
+      max-width:1200px; margin:14px auto 0; padding:0 14px;
+      display:grid; grid-template-columns:1fr 220px; gap:10px;
+    }
+    .search{
+      padding:10px 12px; border:1px solid #d1d5db; border-radius:10px; outline-offset:2px; font-size:15px; width:100%;
+    }
+    .select{
+      padding:10px 12px; border:1px solid #d1d5db; border-radius:10px; background:#fff; font-size:15px; width:100%;
+    }
+
+    /* ====== Grid ====== */
+    .wrap{ max-width:1200px; margin:14px auto; padding:0 14px; }
+    .grid{
+      display:grid; gap:16px;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+    }
+    @media (max-width:1100px){ .grid{grid-template-columns:repeat(3,1fr);} }
+    @media (max-width:800px){ .grid{grid-template-columns:repeat(2,1fr);} }
+    @media (max-width:520px){ .grid{grid-template-columns:1fr;} }
+
+    .card{
+      background:var(--card); border-radius:14px; padding:12px;
+      box-shadow:0 4px 16px rgba(0,0,0,.08);
+      display:flex; flex-direction:column; gap:8px;
+      transition:transform .2s ease, box-shadow .2s ease;
+    }
+    .card:hover{ transform:translateY(-3px); box-shadow:0 10px 24px rgba(0,0,0,.12); }
+    .thumb{
+      width:100%; height:160px; border-radius:10px; background:#f7fafc;
+      object-fit:contain; border:1px solid #e5e7eb;
+    }
+    .name{ font-weight:700; color:#0b3d91; text-align:center; }
+    .desc{ color:var(--muted); font-size:13px; min-height:32px; text-align:center; }
+    .meta{ display:flex; align-items:center; justify-content:space-between; font-size:14px; color:#374151; }
+    .price{ color:#1f2937; font-weight:700; }
+    .add{
+      margin-top:6px; border:none; border-radius:10px; background:var(--brand-2); color:#fff; padding:8px 10px; font-weight:700; cursor:pointer;
+    }
+
+    /* ====== Modal ====== */
+    .overlay{ position:fixed; inset:0; background:rgba(0,0,0,.45); display:none; align-items:center; justify-content:center; z-index:1300; }
+    .modal{
+      width:min(92vw,700px); background:#fff; border-radius:12px; padding:16px; max-height:85vh; overflow:auto;
+      box-shadow:0 30px 60px rgba(0,0,0,.35);
+    }
+    .modal h3{ margin:0 0 10px; color:var(--brand-2); }
+    .pm-list{ display:flex; flex-wrap:wrap; gap:8px; }
+    .pm-btn{ padding:8px 12px; border-radius:8px; border:1px solid #e5e7eb; background:#f9fafb; cursor:pointer; }
+    .pm-btn.active{ border-color:var(--brand-2); box-shadow:0 6px 18px rgba(39,74,138,.18); }
+    .pm-fields label{ display:block; margin-top:8px; font-size:14px; }
+    .pm-fields input{ width:100%; padding:10px; border:1px solid #d1d5db; border-radius:10px; margin-top:6px; }
+    .modal-actions{ display:flex; justify-content:flex-end; gap:8px; margin-top:12px; }
+    .btn-primary{ background:var(--brand-2); color:#fff; border:none; padding:10px 14px; border-radius:10px; cursor:pointer; }
+    .btn-light{ background:#eef2ff; color:#1f2937; border:none; padding:10px 14px; border-radius:10px; cursor:pointer; }
+
+    /* Footer */
+    footer{ text-align:center; color:#475569; padding:18px 10px; }
   </style>
 </head>
 <body>
 
-<header>
-  <h1>
-    BAGANIZA STORE <span>(Nidal Abu Samra)</span>
-  </h1>
-  <div class="cart-icon" id="cartBtn">
-    <i class="fa fa-shopping-cart fa-2x"></i>
-    <span class="cart-count" id="cartCount">0</span>
-    <div class="cart-dropdown" id="cartDropdown">
-      <div id="cartItems"></div>
-      <p><strong>الإجمالي: <span id="cartTotal">0</span> ريال</strong></p>
-      <button class="btn btn-success w-100" id="checkoutBtn">Checkout</button>
+  <!-- ====== HEADER ====== -->
+  <header>
+    <div class="brand">
+      BAGANIZA STORE <span class="sub">(Nidal Abu Samra)</span>
     </div>
-  </div>
-</header>
 
-<div class="container mt-4">
-  <!-- البحث والتصنيف -->
-  <div class="row mb-3">
-    <div class="col-md-6">
-      <input type="text" id="searchInput" class="form-control" placeholder="ابحث عن منتج...">
-    </div>
-    <div class="col-md-6">
-      <select id="categoryFilter" class="form-control">
-        <option value="all">كل التصنيفات</option>
-        <option value="electronics">إلكترونيات</option>
-        <option value="clothes">ملابس</option>
-        <option value="home">منزل</option>
-      </select>
-    </div>
-  </div>
-
-  <!-- شبكة المنتجات -->
-  <div class="row" id="productGrid"></div>
-</div>
-
-<!-- نافذة الدفع -->
-<div class="modal fade checkout-modal" id="checkoutModal" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">خيارات الدفع</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <select id="paymentMethod" class="form-control mb-3">
-          <option value="">اختر طريقة الدفع</option>
-          <option value="cash">كاش</option>
-          <option value="stc">STC Pay</option>
-          <option value="paypal">PayPal</option>
-          <option value="card">بطاقة بنكية</option>
-        </select>
-        <div id="paymentDetails"></div>
+    <div class="actions">
+      <button class="cart-btn" id="cartBtn">
+        <span>السلة</span>
+        <span class="count" id="cartCount">0</span>
+      </button>
+      <div class="cart-menu" id="cartMenu" dir="rtl">
+        <div id="cartItems"></div>
+        <div class="cart-total">الإجمالي: <span id="cartTotal">0</span> ريال</div>
+        <button class="checkout-btn" id="checkoutBtn">Checkout</button>
       </div>
     </div>
+  </header>
+
+  <!-- ====== TOOLBAR ====== -->
+  <div class="toolbar" dir="rtl">
+    <input id="searchInput" class="search" type="text" placeholder="ابحث باسم المنتج..." />
+    <select id="categorySelect" class="select">
+      <option value="">كل التصنيفات</option>
+    </select>
   </div>
-</div>
 
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <!-- ====== PRODUCTS GRID ====== -->
+  <div class="wrap">
+    <section id="productsContainer" class="grid" aria-live="polite"></section>
+  </div>
 
-<script>
-  // Firebase Config
-  const firebaseConfig = {
-    apiKey: "YOUR_KEY",
-    authDomain: "YOUR_DOMAIN",
-    databaseURL: "YOUR_DB_URL",
-    projectId: "YOUR_PROJECT",
-    storageBucket: "YOUR_BUCKET",
-    messagingSenderId: "YOUR_SENDER",
-    appId: "YOUR_APP"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
+  <!-- ====== CHECKOUT MODAL ====== -->
+  <div id="overlay" class="overlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-label="الدفع">
+      <h3>إتمام الشراء</h3>
+      <div id="orderSummary" style="background:#f8fafc;border:1px solid #e5e7eb;border-radius:10px;padding:10px;margin-bottom:10px;font-size:14px"></div>
 
-  const productGrid = document.getElementById("productGrid");
-  const searchInput = document.getElementById("searchInput");
-  const categoryFilter = document.getElementById("categoryFilter");
-  let products = [];
-  let cart = {};
+      <div style="font-weight:700;margin-bottom:6px">اختر وسيلة الدفع</div>
+      <div class="pm-list" id="pmList">
+        <button class="pm-btn" data-method="cash">الدفع عند الاستلام</button>
+        <button class="pm-btn" data-method="stcpay">STC Pay</button>
+        <button class="pm-btn" data-method="paypal">PayPal</button>
+        <button class="pm-btn" data-method="card">بطاقة بنكية</button>
+      </div>
 
-  // جلب المنتجات
-  db.ref("products").on("value", snapshot => {
-    productGrid.innerHTML = "";
-    products = [];
-    snapshot.forEach(child => {
-      const product = child.val();
-      product.id = child.key;
-      products.push(product);
+      <div class="pm-fields" id="pmFields"></div>
 
-      const col = document.createElement("div");
-      col.className = "col-lg-3 col-md-4 col-sm-6 mb-4 product-card";
-      col.setAttribute("data-name", product.name);
-      col.setAttribute("data-category", product.category || "other");
+      <div class="modal-actions">
+        <button class="btn-light" id="cancelCheckout">إلغاء</button>
+        <button class="btn-primary" id="confirmCheckout">تأكيد الطلب</button>
+      </div>
+    </div>
+  </div>
 
-      col.innerHTML = `
-        <div class="product-card">
-          <img src="${product.imageUrl || 'https://via.placeholder.com/150'}" alt="${product.name}">
-          <h5>${product.name}</h5>
-          <p>${product.price} ريال</p>
-          <button class="btn btn-primary addToCartBtn">أضف إلى السلة</button>
-        </div>
-      `;
+  <footer>All Right Reserved for Nidal Abu Samra 2025</footer>
 
-      col.querySelector(".addToCartBtn").addEventListener("click", () => addToCart(product));
-      productGrid.appendChild(col);
+  <!-- ====== Firebase (Compat) ====== -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+  <script>
+    /* === Firebase Config (نفس إعداداتك) === */
+    const firebaseConfig = {
+      apiKey: "AIzaSyCcWgFDzs95TbVU7v5h_5O0lNzZvBlL90o",
+      authDomain: "baganiza-66bf0.firebaseapp.com",
+      projectId: "baganiza-66bf0",
+      storageBucket: "baganiza-66bf0.firebasestorage.app",
+      messagingSenderId: "1016966032123",
+      appId: "1:1016966032123:web:fbffd397c7d8494fa79e5e"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    /* === State === */
+    let PRODUCTS = [];   // {id,name,price,description,category,imageUrl}
+    let CART = {};       // id -> {product, qty}
+
+    /* === DOM === */
+    const productsContainer = document.getElementById('productsContainer');
+    const categorySelect    = document.getElementById('categorySelect');
+    const searchInput       = document.getElementById('searchInput');
+
+    const cartBtn   = document.getElementById('cartBtn');
+    const cartMenu  = document.getElementById('cartMenu');
+    const cartItems = document.getElementById('cartItems');
+    const cartTotal = document.getElementById('cartTotal');
+    const cartCount = document.getElementById('cartCount');
+
+    const overlay          = document.getElementById('overlay');
+    const pmList           = document.getElementById('pmList');
+    const pmFields         = document.getElementById('pmFields');
+    const orderSummary     = document.getElementById('orderSummary');
+    const checkoutBtn      = document.getElementById('checkoutBtn');
+    const cancelCheckout   = document.getElementById('cancelCheckout');
+    const confirmCheckout  = document.getElementById('confirmCheckout');
+
+    /* === Helpers === */
+    const SAR = n => `${Number(n).toFixed(2)} ريال`;
+    const imgOrPlaceholder = url => url ? url : 'https://via.placeholder.com/400x300?text=No+Image';
+
+    function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' })[c]); }
+
+    /* === Load products & categories (real-time) === */
+    db.collection('products').onSnapshot(snap=>{
+      PRODUCTS = [];
+      const cats = new Set();
+      snap.forEach(doc=>{
+        const d = doc.data();
+        const p = {
+          id: doc.id,
+          name: d.name || '',
+          price: Number(d.price)||0,
+          description: d.description || '',
+          category: d.category || '',
+          imageUrl: d.imageUrl || ''
+        };
+        PRODUCTS.push(p);
+        if(p.category) cats.add(p.category);
+      });
+
+      // fill categories (keep current value)
+      const selected = categorySelect.value;
+      categorySelect.innerHTML = '<option value="">كل التصنيفات</option>';
+      [...cats].sort((a,b)=>a.localeCompare(b,'ar')).forEach(c=>{
+        const opt = document.createElement('option');
+        opt.value = c; opt.textContent = c;
+        categorySelect.appendChild(opt);
+      });
+      if ([...cats].includes(selected) || selected==='') categorySelect.value = selected;
+
+      renderProducts();
     });
-    renderProducts();
-  });
 
-  // عرض المنتجات مع البحث/التصنيف
-  function renderProducts(filterText = "", filterCategory = "all") {
-    const cards = productGrid.querySelectorAll(".product-card");
+    /* === Render products with filter (no name mutation) === */
+    function renderProducts(){
+      const term = searchInput.value.trim().toLowerCase();
+      const cat  = categorySelect.value.trim();
 
-    cards.forEach(card => {
-      const name = card.getAttribute("data-name").toLowerCase();
-      const category = card.getAttribute("data-category").toLowerCase();
+      productsContainer.innerHTML = '';
+      const filtered = PRODUCTS.filter(p=>{
+        const matchText = p.name.toLowerCase().includes(term);
+        const matchCat  = !cat || p.category === cat;
+        return matchText && matchCat;
+      });
 
-      const matchText = name.includes(filterText.toLowerCase());
-      const matchCategory = filterCategory === "all" || category === filterCategory;
+      if(filtered.length===0){
+        productsContainer.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:#6b7280">لا توجد منتجات مطابقة</div>`;
+        return;
+      }
 
-      card.style.display = (matchText && matchCategory) ? "block" : "none";
-    });
-  }
-
-  // البحث
-  searchInput.addEventListener("input", e => {
-    renderProducts(e.target.value, categoryFilter.value);
-  });
-
-  // التصنيف
-  categoryFilter.addEventListener("change", e => {
-    renderProducts(searchInput.value, e.target.value);
-  });
-
-  // السلة
-  const cartBtn = document.getElementById("cartBtn");
-  const cartDropdown = document.getElementById("cartDropdown");
-  const cartItems = document.getElementById("cartItems");
-  const cartCount = document.getElementById("cartCount");
-  const cartTotal = document.getElementById("cartTotal");
-
-  cartBtn.addEventListener("click", () => {
-    cartDropdown.style.display = cartDropdown.style.display === "block" ? "none" : "block";
-  });
-
-  function addToCart(product) {
-    if (!cart[product.id]) {
-      cart[product.id] = { ...product, qty: 0 };
+      filtered.forEach(p=>{
+        const card = document.createElement('article');
+        card.className = 'card';
+        card.innerHTML = `
+          <img class="thumb" src="${escapeHtml(imgOrPlaceholder(p.imageUrl))}" alt="${escapeHtml(p.name)}">
+          <div class="name">${escapeHtml(p.name)}</div>
+          <div class="desc">${escapeHtml(p.description)}</div>
+          <div class="meta">
+            <span class="price">${SAR(p.price)}</span>
+            <span style="color:#64748b">${escapeHtml(p.category||'')}</span>
+          </div>
+          <button class="add">أضف إلى السلة</button>
+        `;
+        card.querySelector('.add').addEventListener('click', ()=> addToCart(p));
+        productsContainer.appendChild(card);
+      });
     }
-    cart[product.id].qty++;
-    updateCart();
-  }
 
-  function removeFromCart(id) {
-    delete cart[id];
-    updateCart();
-  }
+    /* === Filters events === */
+    searchInput.addEventListener('input', renderProducts);
+    categorySelect.addEventListener('change', renderProducts);
 
-  function updateCart() {
-    cartItems.innerHTML = "";
-    let total = 0, count = 0;
+    /* === Cart === */
+    function addToCart(product){
+      if(!CART[product.id]) CART[product.id] = {product, qty:0};
+      CART[product.id].qty += 1;
+      updateCartUI();
+    }
+    function removeFromCart(id){
+      delete CART[id];
+      updateCartUI();
+    }
+    function updateCartUI(){
+      cartItems.innerHTML = '';
+      let total=0, count=0;
+      Object.values(CART).forEach(({product,qty})=>{
+        const sub = product.price*qty;
+        total += sub; count += qty;
+        const row = document.createElement('div');
+        row.className='cart-item';
+        row.innerHTML = `
+          <div class="name">${escapeHtml(product.name)} × ${qty}</div>
+          <div style="white-space:nowrap">${Number(sub).toFixed(2)} ريال</div>
+          <button class="remove" title="حذف">&times;</button>
+        `;
+        row.querySelector('.remove').addEventListener('click',()=>removeFromCart(product.id));
+        cartItems.appendChild(row);
+      });
+      cartTotal.textContent = Number(total).toFixed(2);
+      cartCount.textContent = count;
+    }
 
-    Object.values(cart).forEach(item => {
-      const itemTotal = item.qty * item.price;
-      total += itemTotal;
-      count += item.qty;
-
-      const div = document.createElement("div");
-      div.className = "cart-item";
-      div.innerHTML = `
-        <span>${item.name} x ${item.qty} = ${itemTotal} ريال</span>
-        <button onclick="removeFromCart('${item.id}')"><i class="fa fa-times"></i></button>
-      `;
-      cartItems.appendChild(div);
+    cartBtn.addEventListener('click', ()=>{
+      cartMenu.style.display = cartMenu.style.display==='block' ? 'none' : 'block';
+    });
+    // إغلاق القائمة عند الضغط خارجها
+    document.addEventListener('click', (e)=>{
+      if(!cartBtn.contains(e.target) && !cartMenu.contains(e.target)){
+        cartMenu.style.display='none';
+      }
     });
 
-    cartTotal.textContent = total;
-    cartCount.textContent = count;
-  }
+    /* === Checkout Modal === */
+    checkoutBtn.addEventListener('click', ()=>{
+      const items = Object.values(CART);
+      if(items.length===0){ alert('السلة فارغة'); return; }
 
-  // الدفع
-  const checkoutBtn = document.getElementById("checkoutBtn");
-  const checkoutModal = new bootstrap.Modal(document.getElementById("checkoutModal"));
-  const paymentMethod = document.getElementById("paymentMethod");
-  const paymentDetails = document.getElementById("paymentDetails");
+      let html='';
+      let total=0;
+      items.forEach(({product,qty})=>{
+        const sub = product.price*qty; total+=sub;
+        html += `<div>${escapeHtml(product.name)} × ${qty} — ${Number(sub).toFixed(2)} ريال</div>`;
+      });
+      html += `<hr/><div style="font-weight:700">الإجمالي: ${Number(total).toFixed(2)} ريال</div>`;
+      orderSummary.innerHTML = html;
 
-  checkoutBtn.addEventListener("click", () => {
-    checkoutModal.show();
-  });
+      setActivePayment('cash'); // افتراضي
+      overlay.style.display='flex';
+      overlay.setAttribute('aria-hidden','false');
+      cartMenu.style.display='none';
+    });
 
-  paymentMethod.addEventListener("change", e => {
-    const method = e.target.value;
-    paymentDetails.innerHTML = "";
+    cancelCheckout.addEventListener('click', ()=>{
+      overlay.style.display='none';
+      overlay.setAttribute('aria-hidden','true');
+    });
 
-    if (method === "cash") {
-      paymentDetails.innerHTML = "<p>ادفع نقداً عند الاستلام.</p>";
-    } else if (method === "stc") {
-      paymentDetails.innerHTML = '<input type="text" class="form-control" placeholder="أدخل رقم STC Pay">';
-    } else if (method === "paypal") {
-      paymentDetails.innerHTML = '<input type="email" class="form-control" placeholder="أدخل بريد PayPal">';
-    } else if (method === "card") {
-      paymentDetails.innerHTML = `
-        <input type="text" class="form-control mb-2" placeholder="رقم البطاقة">
-        <input type="text" class="form-control mb-2" placeholder="تاريخ الانتهاء">
-        <input type="text" class="form-control" placeholder="CVV">
-      `;
+    // اختيار وسيلة الدفع
+    let selectedMethod = 'cash';
+    pmList.addEventListener('click',(e)=>{
+      const btn = e.target.closest('.pm-btn');
+      if(!btn) return;
+      setActivePayment(btn.dataset.method);
+    });
+
+    function setActivePayment(method){
+      selectedMethod = method;
+      document.querySelectorAll('.pm-btn').forEach(b=> b.classList.toggle('active', b.dataset.method===method));
+      renderPaymentFields(method);
     }
-  });
-</script>
+    function renderPaymentFields(method){
+      pmFields.innerHTML = '';
+      if(method==='cash'){
+        pmFields.innerHTML = `<div style="color:#374151">الدفع نقداً عند الاستلام.</div>`;
+      }else if(method==='stcpay'){
+        pmFields.innerHTML = `
+          <label>رقم STC Pay
+            <input id="stcPhone" type="tel" placeholder="05XXXXXXXX">
+          </label>`;
+      }else if(method==='paypal'){
+        pmFields.innerHTML = `
+          <label>بريد PayPal
+            <input id="paypalEmail" type="email" placeholder="name@example.com">
+          </label>`;
+      }else if(method==='card'){
+        pmFields.innerHTML = `
+          <label>رقم البطاقة
+            <input id="cardNumber" inputmode="numeric" maxlength="19" placeholder="1234 5678 9012 3456">
+          </label>
+          <label>تاريخ الانتهاء (MM/YY)
+            <input id="cardExpiry" placeholder="MM/YY">
+          </label>
+          <label>CVV
+            <input id="cardCVC" inputmode="numeric" maxlength="4" placeholder="123">
+          </label>`;
+      }
+    }
 
+    // تأكيد (ديمو فقط: لا بوابة دفع فعلية هنا)
+    confirmCheckout.addEventListener('click', ()=>{
+      // تحقق بسيط
+      if(selectedMethod==='stcpay' && !document.getElementById('stcPhone')?.value.trim()){
+        alert('الرجاء إدخال رقم STC Pay'); return;
+      }
+      if(selectedMethod==='paypal' && !document.getElementById('paypalEmail')?.value.trim()){
+        alert('الرجاء إدخال بريد PayPal'); return;
+      }
+      if(selectedMethod==='card'){
+        const n = document.getElementById('cardNumber')?.value.trim();
+        const e = document.getElementById('cardExpiry')?.value.trim();
+        const c = document.getElementById('cardCVC')?.value.trim();
+        if(!n || !e || !c){ alert('الرجاء إدخال بيانات البطاقة'); return; }
+      }
+      alert('تم إنشاء الطلب (نموذج توضيحي).');
+      CART = {};
+      updateCartUI();
+      overlay.style.display='none';
+      overlay.setAttribute('aria-hidden','true');
+    });
+
+  </script>
 </body>
 </html>
