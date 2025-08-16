@@ -6,123 +6,197 @@
   <title>BAGANIZA STORE (Nidal Abu Samra)</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
       margin: 0; padding: 0;
-      background: #f8f9fc;
+      background: #f5f7fa;
       color: #333;
     }
     header {
-      background: linear-gradient(90deg, #2c3e50, #3498db);
+      background: linear-gradient(90deg, #1e3c72, #2a5298);
       color: white;
-      padding: 15px;
+      padding: 15px 30px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
     }
     header h1 {
       margin: 0;
-      font-size: 24px;
+      font-size: 26px;
       font-weight: bold;
     }
     header h1 small {
       font-size: 14px;
       color: #f1c40f;
-      margin-left: 5px;
+      margin-left: 6px;
     }
     #cart {
       position: relative;
       background: white;
       color: #333;
-      padding: 8px 15px;
+      padding: 8px 18px;
       border-radius: 20px;
       cursor: pointer;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      font-weight: bold;
     }
     #cartItems {
       display: none;
       position: absolute;
       right: 0;
-      top: 40px;
+      top: 50px;
       background: white;
       border: 1px solid #ccc;
       width: 300px;
       padding: 10px;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      border-radius: 10px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.2);
       z-index: 100;
     }
     #cartItems ul {
       list-style: none;
-      margin: 0;
-      padding: 0;
+      margin: 0; padding: 0;
     }
     #cartItems li {
-      margin: 5px 0;
+      margin: 6px 0;
+      font-size: 15px;
+    }
+    #productsContainer {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 20px;
+      padding: 20px;
     }
     .product {
       background: white;
-      margin: 15px;
       padding: 15px;
-      border-radius: 10px;
+      border-radius: 12px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       display: flex;
+      flex-direction: column;
       align-items: center;
+      text-align: center;
+      transition: transform 0.2s;
+    }
+    .product:hover {
+      transform: translateY(-5px);
     }
     .product img {
-      width: 80px;
-      height: 80px;
+      width: 120px;
+      height: 120px;
       object-fit: cover;
-      margin-right: 15px;
       border-radius: 10px;
+      margin-bottom: 10px;
     }
-    .product-details {
-      flex-grow: 1;
+    .product h3 {
+      margin: 5px 0;
+      font-size: 18px;
+    }
+    .product p {
+      font-size: 14px;
+      color: #666;
     }
     .product button {
-      background: #3498db;
+      background: #2a5298;
       color: white;
       border: none;
-      padding: 8px 15px;
-      border-radius: 5px;
+      padding: 8px 14px;
+      border-radius: 6px;
       cursor: pointer;
+      margin-top: auto;
     }
     .product button:hover {
-      background: #2980b9;
+      background: #1e3c72;
     }
-    #checkoutSection {
-      text-align: center;
-      margin: 20px;
-    }
-    #paymentOptions {
-      display: none;
+    #checkoutBtn {
+      background: #27ae60;
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
       margin-top: 10px;
+      cursor: pointer;
+    }
+    #checkoutBtn:hover {
+      background: #1e8449;
+    }
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 200;
+    }
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+      width: 320px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+    .modal-content h2 {
+      margin-top: 0;
+      font-size: 20px;
+    }
+    .modal-content button {
+      display: block;
+      width: 100%;
+      margin: 8px 0;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: bold;
+      transition: background 0.2s;
+    }
+    .btn-cash { background: #27ae60; color: white; }
+    .btn-stc { background: #8e44ad; color: white; }
+    .btn-paypal { background: #3498db; color: white; }
+    .btn-card { background: #e67e22; color: white; }
+    .modal-content button:hover {
+      opacity: 0.85;
     }
     footer {
-      background: #2c3e50;
+      background: #1e3c72;
       color: white;
       text-align: center;
-      padding: 10px;
+      padding: 12px;
       font-size: 14px;
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
   <header>
     <h1>BAGANIZA STORE <small>(Nidal Abu Samra)</small></h1>
-    <div id="cart">🛒 Cart (<span id="cartCount">0</span>)
+    <div id="cart">🛒 (<span id="cartCount">0</span>)
       <div id="cartItems">
         <ul id="cartList"></ul>
         <button id="checkoutBtn">Checkout</button>
-        <div id="paymentOptions">
-          <p>Select Payment Method:</p>
-          <button onclick="pay('Cash')">Cash</button>
-          <button onclick="pay('Card')">Card</button>
-        </div>
       </div>
     </div>
   </header>
 
   <main id="productsContainer"></main>
+
+  <!-- Payment Modal -->
+  <div class="modal" id="paymentModal">
+    <div class="modal-content">
+      <h2>Select Payment Method</h2>
+      <button class="btn-cash" onclick="pay('Cash')">💵 Cash</button>
+      <button class="btn-stc" onclick="pay('STC Pay')">📱 STC Pay</button>
+      <button class="btn-paypal" onclick="pay('PayPal')">💳 PayPal</button>
+      <button class="btn-card" onclick="pay('Card')">💳 Credit Card</button>
+      <br>
+      <button onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
 
   <footer>
     All Rights Reserved for Nidal Abu Samra 2025
@@ -133,7 +207,6 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
   <script>
-    // Firebase config (نفسه مثل admin)
     const firebaseConfig = {
       apiKey: "AIzaSyCcWgFDzs95TbVU7v5h_5O0lNzZvBlL90o",
       authDomain: "baganiza-66bf0.firebaseapp.com",
@@ -142,7 +215,6 @@
       messagingSenderId: "1016966032123",
       appId: "1:1016966032123:web:fbffd397c7d8494fa79e5e"
     };
-
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
@@ -152,9 +224,8 @@
     const cartList = document.getElementById("cartList");
     const cartItemsDiv = document.getElementById("cartItems");
     const checkoutBtn = document.getElementById("checkoutBtn");
-    const paymentOptions = document.getElementById("paymentOptions");
+    const paymentModal = document.getElementById("paymentModal");
 
-    // تحميل المنتجات من Firestore
     function loadProducts() {
       db.collection("products").get().then(snapshot => {
         productsContainer.innerHTML = "";
@@ -164,20 +235,25 @@
           productDiv.className = "product";
 
           const img = document.createElement("img");
-          img.src = product.imageUrl ? product.imageUrl : "https://via.placeholder.com/80";
+          img.src = product.imageUrl ? product.imageUrl : "https://via.placeholder.com/120";
 
-          const detailsDiv = document.createElement("div");
-          detailsDiv.className = "product-details";
-          detailsDiv.innerHTML = `<h3>${product.name}</h3>
-                                  <p>${product.description}</p>
-                                  <p><strong>$${product.price}</strong></p>`;
+          const name = document.createElement("h3");
+          name.textContent = product.name;
+
+          const desc = document.createElement("p");
+          desc.textContent = product.description;
+
+          const price = document.createElement("p");
+          price.innerHTML = `<strong>$${product.price}</strong>`;
 
           const btn = document.createElement("button");
           btn.textContent = "Add to Cart";
           btn.onclick = () => addToCart(doc.id, product);
 
           productDiv.appendChild(img);
-          productDiv.appendChild(detailsDiv);
+          productDiv.appendChild(name);
+          productDiv.appendChild(desc);
+          productDiv.appendChild(price);
           productDiv.appendChild(btn);
 
           productsContainer.appendChild(productDiv);
@@ -189,7 +265,7 @@
       if(cart[id]) {
         cart[id].quantity++;
       } else {
-        cart[id] = {...product, quantity:1};
+        cart[id] = {...product, quantity: 1};
       }
       updateCart();
     }
@@ -211,14 +287,18 @@
     });
 
     checkoutBtn.addEventListener("click", () => {
-      paymentOptions.style.display = "block";
+      paymentModal.style.display = "flex";
     });
+
+    function closeModal() {
+      paymentModal.style.display = "none";
+    }
 
     function pay(method) {
       alert("Payment method selected: " + method);
+      closeModal();
     }
 
-    // init
     loadProducts();
   </script>
 </body>
